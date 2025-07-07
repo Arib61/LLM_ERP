@@ -1,0 +1,14 @@
+2025-07-07 11:45:57,170 - INFO - 📤 Question 1: Quels clients ont commandé des produits en avril 2024 ?
+2025-07-07 11:47:49,299 - INFO - 📤 Question 1: Quels clients ont commandé des produits en avril 2024 ?
+2025-07-07 11:49:23,184 - INFO - ✅ Question 1 analysée avec succès.
+2025-07-07 11:49:23,189 - INFO - 📤 Question 2: Quelle est la commande la plus récente ?
+2025-07-07 11:51:16,358 - INFO - ✅ Question 2 analysée avec succès.
+2025-07-07 11:51:16,358 - INFO - 📤 Question 3: Donne-moi les produits commandés par le client Involys.
+2025-07-07 11:52:32,077 - INFO - ✅ Question 3 analysée avec succès.
+2025-07-07 11:52:32,079 - INFO - 📤 Question 4: Combien de commandes ont été passées en 2023 ?
+2025-07-07 11:53:46,509 - INFO - ✅ Question 4 analysée avec succès.
+2025-07-07 11:53:46,511 - INFO - 📤 Question 5: Quels sont les clients situés à Casablanca ?
+2025-07-07 11:54:51,797 - INFO - ✅ Question 5 analysée avec succès.
+2025-07-07 11:54:51,799 - INFO - 📤 Question 6: Quels sont les produits dans la catégorie informatique ?
+2025-07-07 11:55:40,677 - INFO - ✅ Question 6 analysée avec succès.
+2025-07-07 11:55:40,680 - INFO - 📤 Question 7: Liste les commandes de plus de 1000 MAD.
