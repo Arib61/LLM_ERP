@@ -1,0 +1,3832 @@
+--- Question 01 ---
+Question : Quel est le nombre total de clients dans la base ?
+--- SQL brute ---
+SELECT COUNT(DISTINCT clients.id) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id;
+--- SQL corrigée ---
+SELECT COUNT(DISTINCT clients.id) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id;
+--- SQL validée ---
+SELECT COUNT(DISTINCT clients.id) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id
+Temps (s) : 0.2
+
+--- Question 02 ---
+Question : Liste les noms de tous les produits.
+--- SQL brute ---
+SELECT p.nom FROM produits p JOIN commandes c ON p.id = c.produit_id JOIN clients cl ON c.client_id = cl.id WHERE cl.secteur = 'Métalurgie' AND p.categorie = 'Alimentation';
+--- SQL corrigée ---
+SELECT nom 
+FROM produits;
+--- SQL validée ---
+SELECT nom 
+FROM produits
+Temps (s) : 0.82
+
+--- Question 03 ---
+Question : Quelle est la commande ayant le montant le plus élevé ?
+--- SQL brute ---
+SELECT clients.id, clients.nom, MAX(commandes.montant) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id;
+--- SQL corrigée ---
+SELECT * FROM (
+  SELECT commandes.montant, clients.nom
+  FROM commandes
+  INNER JOIN clients ON commandes.client_id = clients.id
+  ORDER BY commandes.montant DESC
+) AS temp
+LIMIT 1;
+--- SQL validée ---
+SELECT * FROM (
+  SELECT commandes.montant, clients.nom
+  FROM commandes
+  INNER JOIN clients ON commandes.client_id = clients.id
+) AS temp
+ORDER BY commandes.montant DESC
+LIMIT 1
+Temps (s) : 3.03
+
+--- Question 04 ---
+Question : Quel est le total des ventes par client ?
+--- SQL brute ---
+SELECT clients.nom, SUM(commandes.montant) AS total_ventes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom;
+--- SQL corrigée ---
+SELECT 
+... ...  (Insert your SQL query here)
+... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ...  ... ... ...  ... ... ...  ... ... ...  ...
+--- SQL validée ---
+SELECT 
+... ...  (Insert your SQL query here)
+Temps (s) : 3.01
+
+--- Question 05 ---
+Question : Quels produits n’ont jamais été commandés ?
+--- SQL brute ---
+SELECT p.nom FROM produits p LEFT JOIN commandes c ON p.id = c.produit_id WHERE c.id IS NULL;
+--- SQL corrigée ---
+SELECT p.nom FROM produits p WHERE p.id NOT IN (SELECT produit_id FROM commandes);
+--- SQL validée ---
+SELECT p.nom FROM produits p WHERE p.id NOT IN (SELECT produit_id FROM commandes)
+Temps (s) : 3.0
+
+--- Question 06 ---
+Question : Quel est le chiffre d'affaires total pour chaque secteur ?
+--- SQL brute ---
+SELECT s.secteur, SUM(c.montant) as chiffre_affaire FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id JOIN fournisseurs f ON p.fournisseur_id = f.id JOIN (SELECT DISTINCT secteur FROM clients) s ON cl.secteur = s.secteur GROUP BY s.secteur;
+--- SQL corrigée ---
+SELECT c.secteur, SUM(c.montant) as chiffre_affaire
+FROM commandes c
+JOIN clients cl ON c.client_id = cl.id
+GROUP BY c.secteur;
+--- SQL validée ---
+SELECT c.secteur, SUM(c.montant) AS chiffre_affaire
+FROM commandes c
+JOIN clients cl ON c.client_id = cl.id
+GROUP BY c.secteur
+Temps (s) : 3.02
+
+--- Question 07 ---
+Question : Quels sont les clients ayant passé plus de 3 commandes ?
+--- SQL brute ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id HAVING COUNT(*) > 3;
+--- SQL corrigée ---
+SELECT nom 
+FROM clients 
+WHERE id IN (
+  SELECT client_id 
+  FROM commandes 
+  GROUP BY client_id 
+  HAVING COUNT(*) > 3
+);
+--- SQL validée ---
+SELECT nom FROM clients WHERE id IN (SELECT client_id FROM commandes GROUP BY client_id HAVING COUNT(*) > 3
+Temps (s) : 3.0
+
+--- Question 08 ---
+Question : Quel est le montant moyen d'une commande pour chaque client ?
+--- SQL brute ---
+SELECT clients.id, AVG(commandes.montant) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id;
+--- SQL corrigée ---
+SELECT clients.id, AVG(commandes.montant) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id;
+--- SQL validée ---
+SELECT clients.id, AVG(commandes.montant) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id
+Temps (s) : 0.13
+
+--- Question 09 ---
+Question : Combien de commandes ont été passées en 2023 ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes AS c JOIN clients AS cl ON c.client_id = cl.id JOIN produits AS p ON c.produit_id = p.id WHERE YEAR(c.date_commande) = 2023;
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes WHERE EXTRACT(YEAR FROM date_commande) = 2023;
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes WHERE EXTRACT(YEAR FROM date_commande) = 2023
+Temps (s) : 0.34
+
+--- Question 10 ---
+Question : Quel est le produit le plus vendu en quantité ?
+--- SQL brute ---
+SELECT p.nom, SUM(c.montant) as total_ventes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom ORDER BY total_ventes DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT p.nom, SUM(c.montant) as total_ventes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom ORDER BY total_ventes DESC LIMIT 1;
+--- SQL validée ---
+SELECT p.nom, SUM(c.montant) as total_ventes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom ORDER BY total_ventes DESC LIMIT 1
+Temps (s) : 3.01
+
+--- Question 11 ---
+Question : Donne le nombre de produits par catégorie.
+--- SQL brute ---
+SELECT c.categorie, COUNT(p.id) AS nombre_produits FROM produits p JOIN commandes c ON p.id = c.produit_id GROUP BY c.categorie;
+--- SQL corrigée ---
+SELECT c.categorie, COUNT(p.id) AS nombre_produits FROM produits p JOIN commandes c ON p.id = c.produit_id GROUP BY c.categorie;
+--- SQL validée ---
+SELECT c.categorie, COUNT(p.id) AS nombre_produits FROM produits p JOIN commandes c ON p.id = c.produit_id GROUP BY c.categorie
+Temps (s) : 0.3
+
+--- Question 12 ---
+Question : Quel est le montant total des commandes pour le mois de janvier ?
+--- SQL brute ---
+SELECT SUM(c.montant) as total_commandes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE c.date_commande BETWEEN '2022-01-01' AND '2022-01-31';
+--- SQL corrigée ---
+INSERT INTO clients (id, nom, secteur, ville) VALUES (1, 'Client1', 'secteur1', 'ville1');
+--- SQL validée ---
+SELECT SUM(montant) FROM commandes WHERE date_commande LIKE "2016-01%"
+Temps (s) : 3.0
+
+--- Question 13 ---
+Question : Liste les clients ayant commandé un produit de la catégorie Informatique.
+--- SQL brute ---
+SELECT clients.nom FROM commandes
+JOIN clients ON commandes.client_id = clients.id
+JOIN produits ON commandes.produit_id = produits.id
+WHERE produits.categorie = 'Informatique';
+--- SQL corrigée ---
+SELECT c.nom FROM clients c
+JOIN commandes cm ON c.id = cm.client_id
+JOIN produits p ON cm.produit_id = p.id
+WHERE p.categorie = 'Informatique';
+--- SQL validée ---
+SELECT c.nom FROM clients c
+JOIN commandes cm ON c.id = cm.client_id
+JOIN produits p ON cm.produit_id = p.id
+Temps (s) : 3.01
+
+--- Question 14 ---
+Question : Quel est le nombre de fournisseurs localisés en France ?
+--- SQL brute ---
+SELECT COUNT(DISTINCT clients.id) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE clients.ville = 'France';
+--- SQL corrigée ---
+SELECT COUNT(DISTINCT clients.id) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE clients.ville = 'France';
+--- SQL validée ---
+SELECT COUNT(DISTINCT clients.id) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE clients.ville = "France"
+Temps (s) : 0.8
+
+--- Question 15 ---
+Question : Donne la liste des commandes dont le montant dépasse 1000 euros.
+--- SQL brute ---
+SELECT c.id, c.date_commande, c.montant FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits pr ON c.produit_id = pr.id WHERE c.montant > 1000;
+--- SQL corrigée ---
+SELECT 
+  c.id,
+  c.date_commande,
+  c.montant 
+FROM 
+  commandes c 
+WHERE 
+  c.montant > 1000;
+--- SQL validée ---
+SELECT 
+  c.id,
+  c.date_commande,
+  c.montant 
+FROM 
+  commandes c
+Temps (s) : 0.67
+
+--- Question 16 ---
+Question : Quel est le client qui a dépensé le plus en 2023 ?
+--- SQL brute ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom ORDER BY SUM(produits.prix_unitaire) DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT nom
+FROM clients
+WHERE id IN (
+  SELECT client_id
+  FROM commandes
+  WHERE date_commande LIKE '2023%'
+  ORDER BY montant DESC
+  LIMIT 1
+);
+--- SQL validée ---
+SELECT nom
+FROM clients
+WHERE id IN (
+  SELECT client_id
+  FROM commandes
+  WHERE date_commande LIKE '2023%'
+  ORDER BY montant DESC
+  LIMIT 1
+Temps (s) : 0.85
+
+--- Question 17 ---
+Question : Quel est le nombre de commandes par fournisseur ?
+--- SQL brute ---
+SELECT f.nom, COUNT(c.id) as nombre_commandes FROM fournisseurs f JOIN clients c ON f.id = c.fournisseur_id JOIN commandes cmd ON c.id = cmd.client_id JOIN produits p ON cmd.produit_id = p.id GROUP BY f.nom;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, COUNT(commandes.id) as nombre_commandes FROM fournisseurs
+JOIN clients ON fournisseurs.id = clients.fournisseur_id
+GROUP BY fournisseurs.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom, COUNT(commandes.id) as nombre_commandes FROM fournisseurs
+JOIN clients ON fournisseurs.id = clients.fournisseur_id
+GROUP BY fournisseurs.nom
+Temps (s) : 0.67
+
+--- Question 18 ---
+Question : Donne la liste des produits vendus à plus de 10 clients différents.
+--- SQL brute ---
+SELECT produits.nom FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY produits.id HAVING COUNT(DISTINCT clients.id) > 10;
+--- SQL corrigée ---
+SELECT produits.nom FROM produits JOIN (SELECT produit_id, COUNT(DISTINCT clients.id) as cnt FROM commandes JOIN clients ON commandes.client_id = clients.id GROUP BY produit_id) as subquery ON produits.id = subquery.produit_id WHERE subquery.cnt > 10;
+--- SQL validée ---
+SELECT produits.nom FROM produits JOIN (SELECT produit_id, COUNT(DISTINCT clients.id) as cnt FROM commandes JOIN clients ON commandes.client_id = clients.id GROUP BY produit_id) as subquery ON produits.id = subquery.produit_id WHERE subquery.cnt > 10
+Temps (s) : 1.23
+
+--- Question 19 ---
+Question : Quel est le nombre moyen de commandes par client ?
+--- SQL brute ---
+SELECT AVG(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.secteur = 'Technologie';
+--- SQL corrigée ---
+SELECT AVG(c.montant) FROM commandes c WHERE c.client_id IN (SELECT id FROM clients WHERE secteur = 'Technologie');
+--- SQL validée ---
+SELECT AVG(c.montant) FROM commandes c WHERE c.client_id IN (SELECT id FROM clients WHERE secteur = 'Technologie')
+Temps (s) : 3.01
+
+--- Question 20 ---
+Question : Quel est le secteur qui génère le plus de chiffre d'affaires ?
+--- SQL brute ---
+SELECT clients.secteur, SUM(commandes.montant) AS total_de_commandes FROM commandes INNER JOIN clients ON commandes.client_id = clients.id GROUP BY clients.secteur ORDER BY total_de_commandes DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT clients.secteur, SUM(commandes.montant) AS total_de_commandes FROM commandes INNER JOIN clients ON commandes.client_id = clients.id GROUP BY clients.secteur ORDER BY total_de_commandes DESC LIMIT 1;
+--- SQL validée ---
+SELECT clients.secteur, SUM(commandes.montant) AS total_de_commandes FROM commandes INNER JOIN clients ON commandes.client_id = clients.id GROUP BY clients.secteur ORDER BY total_de_commandes DESC LIMIT 1
+Temps (s) : 2.03
+
+--- Question 21 ---
+Question : Donne la liste des clients n'ayant jamais passé de commande.
+--- SQL brute ---
+SELECT clients.id, clients.nom FROM clients LEFT JOIN commandes ON clients.id = commandes.client_id LEFT JOIN produits ON commandes.produit_id = produits.id WHERE commandes.id IS NULL
+--- SQL corrigée ---
+SELECT
+    c.id,
+    c.nom
+FROM
+    clients c
+WHERE
+    NOT EXISTS (
+        SELECT 1
+        FROM commandes
+        WHERE client_id = c.id
+    )
+--- SQL validée ---
+SELECT
+    c.id,
+    c.nom
+FROM
+    clients c
+Temps (s) : 0.56
+
+--- Question 22 ---
+Question : Combien de villes différentes comptent des clients ?
+--- SQL brute ---
+SELECT COUNT(DISTINCT c.client_id) FROM commandes c;
+--- SQL corrigée ---
+SELECT
+    COUNT(DISTINCT c.ville)
+FROM
+    clients c;
+--- SQL validée ---
+SELECT
+    COUNT(DISTINCT c.ville)
+Temps (s) : 0.27
+
+--- Question 23 ---
+Question : Quel est le produit ayant généré le plus de chiffre d'affaires en 2024 ?
+--- SQL brute ---
+SELECT produits.nom, SUM(commandes.montant) AS chiffre_affaire FROM commandes INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY produits.nom ORDER BY chiffre_affaire DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT produits.nom, SUM(commandes.montant) AS chiffre_affaire FROM commandes INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY produits.nom ORDER BY chiffre_affaire DESC LIMIT 1;
+--- SQL validée ---
+SELECT produits.nom, SUM(commandes.montant) AS chiffre_affaire FROM commandes INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY produits.nom ORDER BY chiffre_affaire DESC LIMIT 1
+Temps (s) : 3.03
+
+--- Question 24 ---
+Question : Donne la liste des commandes passées entre le 1er janvier et le 31 mars 2024.
+--- SQL brute ---
+SELECT t1.commande FROM commandes AS t1 INNER JOIN clients AS t2 ON t1.client_id = t2.id INNER JOIN produits AS t3 ON t1.produit_id = t3.id WHERE t1.date_commande BETWEEN '2024-01-01' AND '2024-03-31';
+--- SQL corrigée ---
+SELECT * FROM commandes WHERE date_commande BETWEEN '2024-01-01' AND '2024-03-31';
+--- SQL validée ---
+SELECT * FROM commandes WHERE date_commande BETWEEN '2024-01-01' AND '2024-03-31'
+Temps (s) : 3.02
+
+--- Question 25 ---
+Question : Combien de commandes ont été passées pour chaque produit ?
+--- SQL brute ---
+SELECT p.nom AS produit_name, COUNT(c.id) AS nombre_de_commandes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom;
+--- SQL corrigée ---
+SELECT
+--- SQL validée ---
+SELECT nom, COUNT(*) FROM commandes AS T1 JOIN produits AS T2 ON T1.produit_id = T2.id GROUP BY T1.produit_id
+Temps (s) : 3.02
+
+--- Question 26 ---
+Question : Quel est le montant total des commandes pour chaque mois de 2024 ?
+--- SQL brute ---
+SELECT EXTRACT(MONTH FROM date_commande) AS mois, SUM(montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY mois;
+--- SQL corrigée ---
+SELECT 
+  EXTRACT(MONTH FROM date_commande) AS mois, 
+  SUM(montant) AS total_montant 
+FROM 
+  commandes 
+GROUP BY 
+  EXTRACT(MONTH FROM date_commande) 
+ORDER BY 
+  mois;
+--- SQL validée ---
+SELECT 
+  EXTRACT(MONTH FROM date_commande) AS mois, 
+  SUM(montant) AS total_montant 
+FROM 
+  commandes 
+GROUP BY 
+  EXTRACT(MONTH FROM date_commande) 
+ORDER BY 
+  mois
+Temps (s) : 1.96
+
+--- Question 27 ---
+Question : Quels sont les produits qui n’ont jamais été vendus à des clients du secteur 'Santé' ?
+--- SQL brute ---
+SELECT p.nom FROM produits p LEFT JOIN commandes c ON p.id = c.produit_id LEFT JOIN clients cl ON c.client_id = cl.id LEFT JOIN fournisseurs f ON p.id = f.id WHERE cl.secteur != 'Santé' AND f.categorie_fournisseur IS NULL;
+--- SQL corrigée ---
+SELECT p.nom FROM produits p WHERE NOT EXISTS (SELECT 1 FROM commandes c WHERE c.produit_id = p.id AND c.client_id IN (SELECT id FROM clients WHERE secteur = 'Santé'));
+--- SQL validée ---
+SELECT p.nom FROM produits p WHERE NOT EXISTS (SELECT 1 FROM commandes c WHERE c.produit_id = p.id)
+Temps (s) : 3.05
+
+--- Question 28 ---
+Question : Donne la répartition des clients par secteur.
+--- SQL brute ---
+SELECT clients.secteur, COUNT(DISTINCT clients.id) as nombre_clients FROM clients RIGHT JOIN commandes ON clients.id = commandes.client_id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur;
+--- SQL corrigée ---
+SELECT clients.secteur, COUNT(DISTINCT clients.id) as nombre_clients FROM clients RIGHT JOIN commandes ON clients.id = commandes.client_id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur;
+--- SQL validée ---
+SELECT clients.secteur, COUNT(DISTINCT clients.id) AS nombre_clients FROM clients RIGHT JOIN commandes ON clients.id = commandes.client_id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur
+Temps (s) : 0.14
+
+--- Question 29 ---
+Question : Quel est le fournisseur ayant le plus grand nombre de produits référencés ?
+--- SQL brute ---
+SELECT fournisseurs.nom, COUNT(*) as nombre_de_produits FROM fournisseurs INNER JOIN produits ON fournisseurs.id = produits.fournisseur_id GROUP BY fournisseurs.nom ORDER BY nombre_de_produits DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, COUNT(produits.id) as nombre_de_produits
+FROM fournisseurs
+JOIN produits ON fournisseurs.id = produits.fournisseur_id
+GROUP BY fournisseurs.nom
+ORDER BY nombre_de_produits DESC
+LIMIT 1;
+--- SQL validée ---
+SELECT fournisseurs.nom, COUNT(produits.id) as nombre_de_produits
+FROM fournisseurs
+JOIN produits ON fournisseurs.id = produits.fournisseur_id
+GROUP BY fournisseurs.nom
+ORDER BY nombre_de_produits DESC
+Temps (s) : 1.64
+
+--- Question 30 ---
+Question : Liste les commandes dont le montant est compris entre 500 et 1500 euros.
+--- SQL brute ---
+SELECT clients.nom, commandes.date_commande, commandes.montant FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE commandes.montant BETWEEN 500 AND 1500;
+--- SQL corrigée ---
+SELECT clients.nom, commandes.date_commande, commandes.montant
+FROM clients
+INNER JOIN commandes ON clients.id = commandes.client_id
+WHERE commandes.montant BETWEEN 500 AND 1500;
+--- SQL validée ---
+SELECT clients.nom, commandes.date_commande, commandes.montant
+FROM clients
+INNER JOIN commandes ON clients.id = commandes.client_id
+WHERE commandes.montant BETWEEN 500 AND 1500
+Temps (s) : 2.69
+
+--- Question 31 ---
+Question : Combien de clients ont passé des commandes chaque année depuis 2020 ?
+--- SQL brute ---
+SELECT YEAR(date_commande) as Annee, COUNT(DISTINCT clients.id) as Nombre_Clients FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY Annee;
+--- SQL corrigée ---
+SELECT YEAR(date_commande) as Annee, COUNT(DISTINCT clients.id) as Nombre_Clients FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY Annee;
+--- SQL validée ---
+SELECT YEAR(date_commande) AS Annee, COUNT(DISTINCT clients.id) AS Nombre_Clients FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY Annee
+Temps (s) : 0.15
+
+--- Question 32 ---
+Question : Quel est le nombre total de produits vendus en 2023 ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id;
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes;
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande LIKE "%2023%"
+Temps (s) : 2.94
+
+--- Question 33 ---
+Question : Quel est le client ayant commandé le plus de produits différents ?
+--- SQL brute ---
+SELECT clients.nom, COUNT(DISTINCT produits.id) as nombre_produits_différents FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id ORDER BY nombre_produits_différents DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT c.nom, COUNT(DISTINCT p.id) as nombre_produits_différents
+FROM commandes c
+JOIN clients c1 ON c.client_id = c1.id
+JOIN produits p ON c.produit_id = p.id
+GROUP BY c.client_id
+ORDER BY COUNT(DISTINCT p.id) DESC
+LIMIT 1;
+--- SQL validée ---
+SELECT c.nom, COUNT(DISTINCT p.id) AS nombre_produits_différents
+FROM commandes c
+JOIN clients c1 ON c.client_id = c1.id
+JOIN produits p ON c.produit_id = p.id
+GROUP BY c.client_id
+Temps (s) : 2.94
+
+--- Question 34 ---
+Question : Quel est le montant total des commandes pour chaque client et chaque mois ?
+--- SQL brute ---
+SELECT c.client_id, DATE_FORMAT(c.date_commande, '%Y-%m') as mois, SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.client_id, mois;
+--- SQL corrigée ---
+SELECT c.client_id, DATE_FORMAT(c.date_commande, '%Y-%m') as mois, SUM(c.montant) FROM commandes c WHERE c.client_id IS NOT NULL GROUP BY c.client_id, DATE_FORMAT(c.date_commande, '%Y-%m');
+--- SQL validée ---
+SELECT c.client_id, DATE_FORMAT(c.date_commande, '%Y-%m') as mois, SUM(c.montant) FROM commandes c WHERE c.client_id IS NOT NULL GROUP BY c.client_id, DATE_FORMAT(c.date_commande, '%Y-%m')
+Temps (s) : 2.38
+
+--- Question 35 ---
+Question : Combien de commandes ont été livrées en retard ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes AS T1 INNER JOIN clients AS T2 ON T1.client_id = T2.id WHERE T1.date_commande < DATE_SUB(CURRENT_DATE, INTERVAL 1 MONTH);
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande < DATE_SUB(CURRENT_DATE, INTERVAL 1 MONTH);
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande < CURRENT_DATE() - INTERVAL 1 MONTH
+Temps (s) : 2.96
+
+--- Question 36 ---
+Question : Quel est le montant total des commandes par ville ?
+--- SQL brute ---
+SELECT c.ville, SUM(c.montant) as total_commandes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.ville;
+--- SQL corrigée ---
+SELECT ville, SUM(montant) as total_commandes
+FROM commandes
+JOIN clients ON commandes.client_id = clients.id
+GROUP BY ville;
+--- SQL validée ---
+SELECT ville, SUM(montant) AS total_commandes
+FROM commandes
+JOIN clients ON commandes.client_id = clients.id
+GROUP BY ville
+Temps (s) : 0.48
+
+--- Question 37 ---
+Question : Liste les 10 produits les plus commandés.
+--- SQL brute ---
+SELECT produits.nom FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY produits.nom ORDER BY SUM(commandes.montant) LIMIT 10;
+--- SQL corrigée ---
+SELECT produits.nom FROM produits ORDER BY (SELECT COUNT(*) FROM commandes WHERE commandes.produit_id = produits.id) DESC LIMIT 10;
+--- SQL validée ---
+SELECT produits.nom FROM produits ORDER BY (SELECT COUNT(*) FROM commandes WHERE commandes.produit_id = produits.id) DESC LIMIT 10
+Temps (s) : 0.42
+
+--- Question 38 ---
+Question : Quel est le produit le moins vendu ?
+--- SQL brute ---
+SELECT p.nom AS produit_le_moins_vendu FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.id ORDER BY SUM(c.montant) ASC LIMIT 1;
+--- SQL corrigée ---
+SELECT p.nom AS produit_le_moins_vendu 
+FROM produits p 
+WHERE (SELECT COUNT(*) FROM commandes c WHERE c.produit_id = p.id) = (SELECT MIN(count) FROM (SELECT produit_id, COUNT(*) AS count FROM commandes GROUP BY produit_id) AS temp);
+--- SQL validée ---
+SELECT p.nom AS produit_le_moins_vendu 
+FROM produits p 
+WHERE (SELECT COUNT(*) FROM commandes c WHERE c.produit_id = p.id) = (SELECT MIN(count) FROM (SELECT produit_id, COUNT(*) AS count FROM commandes GROUP BY produit_id) AS temp)
+Temps (s) : 2.92
+
+--- Question 39 ---
+Question : Quel est le nombre moyen de produits par commande ?
+--- SQL brute ---
+SELECT AVG(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id;
+--- SQL corrigée ---
+SELECT 
+  AVG(COUNT(c.produit_id)) 
+FROM 
+  commandes c;
+--- SQL validée ---
+SELECT AVG(COUNT(c.produit_id)) FROM commandes c
+Temps (s) : 2.11
+
+--- Question 40 ---
+Question : Quels sont les clients ayant commandé chez plus de 2 fournisseurs différents ?
+--- SQL brute ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id HAVING COUNT(DISTINCT produits.fournisseur_id) > 2;
+--- SQL corrigée ---
+SELECT nom 
+FROM clients 
+WHERE id IN (
+  SELECT client_id 
+  FROM commandes 
+  GROUP BY client_id 
+  HAVING COUNT(DISTINCT fournisseur_id) > 2
+);
+--- SQL validée ---
+SELECT nom 
+FROM clients 
+WHERE id IN (
+  SELECT client_id 
+  FROM commandes 
+  GROUP BY client_id 
+  HAVING COUNT(DISTINCT fournisseur_id) > 2
+Temps (s) : 0.97
+
+--- Question 41 ---
+Question : Donne la liste des produits commandés plus de 100 fois.
+--- SQL brute ---
+SELECT produits.nom FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id WHERE clients.id GROUP BY produits.id HAVING COUNT(*) > 100;
+--- SQL corrigée ---
+SELECT produits.nom 
+FROM produits 
+JOIN commandes ON produits.id = commandes.produit_id 
+GROUP BY produits.id, produits.nom 
+HAVING COUNT(commandes.id) > 100;
+--- SQL validée ---
+SELECT produits.nom 
+FROM produits 
+JOIN commandes ON produits.id = commandes.produit_id 
+GROUP BY produits.id, produits.nom 
+HAVING COUNT(commandes.id) > 100
+Temps (s) : 2.78
+
+--- Question 42 ---
+Question : Quel est le chiffre d'affaires total par fournisseur ?
+--- SQL brute ---
+SELECT fournisseurs.nom AS fournisseur, SUM(commandes.montant) AS total FROM clients JOIN commandes ON clients.id = commandes.client_id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseur;
+--- SQL corrigée ---
+SELECT fournisseurs.nom AS fournisseur, SUM(commandes.montant) AS total FROM fournisseurs JOIN produits ON fournisseurs.id = produits.id JOIN commandes ON produits.id = commandes.produit_id GROUP BY fournisseurs.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom AS fournisseur, SUM(commandes.montant) AS total FROM fournisseurs JOIN produits ON fournisseurs.id = produits.id JOIN commandes ON produits.id = commandes.produit_id GROUP BY fournisseurs.nom
+Temps (s) : 2.95
+
+--- Question 43 ---
+Question : Quel est le nombre de commandes passées pour chaque catégorie de produit ?
+--- SQL brute ---
+SELECT p.categorie, COUNT(c.id) FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie;
+--- SQL corrigée ---
+SELECT p.categorie, COUNT(c.id) 
+FROM produits p 
+JOIN commandes c ON p.id = c.produit_id 
+GROUP BY p.categorie;
+--- SQL validée ---
+SELECT p.categorie, COUNT(c.id) 
+FROM produits p 
+JOIN commandes c ON p.id = c.produit_id 
+GROUP BY p.categorie
+Temps (s) : 2.95
+
+--- Question 44 ---
+Question : Combien de commandes ont été passées le week-end ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes WHERE date_commande BETWEEN '2022-01-14' AND '2022-01-28';
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande BETWEEN '2022-01-14' AND '2022-01-28';
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande BETWEEN '2022-01-14' AND '2022-01-28';
+Temps (s) : 0.13
+
+--- Question 45 ---
+Question : Quel est le montant total des commandes pour chaque année ?
+--- SQL brute ---
+SELECT EXTRACT(YEAR FROM date_commande) AS Annee, SUM(montant) FROM commandes GROUP BY Annee;
+--- SQL corrigée ---
+SELECT EXTRACT(YEAR FROM date_commande) AS Annee, SUM(montant) 
+FROM commandes 
+GROUP BY EXTRACT(YEAR FROM date_commande);
+--- SQL validée ---
+SELECT EXTRACT(YEAR FROM date_commande) AS "Annee", SUM(montant) 
+FROM commandes 
+GROUP BY EXTRACT(YEAR FROM date_commande)
+Temps (s) : 1.53
+
+--- Question 46 ---
+Question : Liste les clients ayant passé des commandes chaque mois de 2023.
+--- SQL brute ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom HAVING COUNT(DISTINCT MONTH(commandes.date_commande)) = 3;
+--- SQL corrigée ---
+SELECT DISTINCT clients.nom 
+FROM clients 
+WHERE clients.id IN (
+  SELECT client_id 
+  FROM commandes 
+  WHERE DATE_FORMAT(date_commande, '%Y') = '2023'
+);
+--- SQL validée ---
+SELECT DISTINCT clients.nom 
+FROM clients 
+WHERE clients.id IN (
+  SELECT client_id 
+  FROM commandes 
+  WHERE DATE_FORMAT(date_commande, '%Y') = '2023'
+Temps (s) : 1.76
+
+--- Question 47 ---
+Question : Quel est le montant moyen d'une commande par secteur de client ?
+--- SQL brute ---
+SELECT clients.secteur, AVG(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur;
+--- SQL corrigée ---
+SELECT 
+  clients.secteur, 
+  AVG(commandes.montant) 
+FROM 
+  commandes 
+JOIN 
+  clients 
+ON 
+  commandes.client_id = clients.id 
+GROUP BY 
+  clients.secteur;
+--- SQL validée ---
+SELECT 
+  clients.secteur, 
+  AVG(commandes.montant)
+Temps (s) : 2.28
+
+--- Question 48 ---
+Question : Donne la liste des commandes pour lesquelles le client et le fournisseur sont dans le même pays.
+--- SQL brute ---
+SELECT DISTINCT T1.id, T1.date_commande, T1.montant, T1.client_id, T1.produit_id FROM commandes AS T1 INNER JOIN clients AS T2 ON T1.client_id = T2.id INNER JOIN produits AS T3 ON T1.produit_id = T3.id INNER JOIN fournisseurs AS T4 ON T3.fournisseur_id = T4.id WHERE T2.ville = T4.ville;
+--- SQL corrigée ---
+SELECT * FROM commandes
+WHERE client_id IN (
+  SELECT id FROM clients
+  WHERE ville IN (
+    SELECT ville FROM fournisseurs
+  )
+);
+--- SQL validée ---
+SELECT * FROM commandes
+WHERE client_id IN (
+  SELECT id FROM clients
+  WHERE ville IN (
+    SELECT ville FROM fournisseurs
+  )
+Temps (s) : 0.82
+
+--- Question 49 ---
+Question : Quels produits ont été commandés à la fois en 2023 et 2024 ?
+--- SQL brute ---
+SELECT produits.nom FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id WHERE commandes.date_commande BETWEEN '2023-01-01' AND '2024-12-31' GROUP BY produits.nom HAVING COUNT(*) > 1;
+--- SQL corrigée ---
+SELECT 
+    produits.nom 
+FROM 
+    produits 
+WHERE 
+    produits.id IN (
+        SELECT 
+            produit_id 
+        FROM 
+            commandes 
+        WHERE 
+            date_commande >= '2023-01-01' AND date_commande <= '2024-12-31'
+        GROUP BY 
+            produit_id 
+        HAVING 
+            COUNT(*) > 1
+    );
+--- SQL validée ---
+SELECT 
+    produits.nom 
+FROM 
+    produits 
+WHERE 
+    produits.id IN (
+        SELECT 
+            produit_id 
+        FROM 
+            commandes 
+        WHERE 
+            date_commande >= '2023-01-01' AND date_commande <= '2024-12-31'
+Temps (s) : 2.95
+
+--- Question 50 ---
+Question : Combien de produits différents ont été commandés par secteur ?
+--- SQL brute ---
+SELECT clients.secteur, COUNT(DISTINCT commandes.produit_id) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur;
+--- SQL corrigée ---
+SELECT 
+    clients.secteur, 
+    COUNT(DISTINCT commandes.produit_id) AS produits_différents
+FROM 
+    commandes 
+JOIN 
+    clients ON commandes.client_id = clients.id
+GROUP BY 
+    clients.secteur;
+--- SQL validée ---
+SELECT 
+    clients.secteur, 
+    COUNT(DISTINCT commandes.produit_id) AS produits_différents
+Temps (s) : 1.52
+
+--- Question 51 ---
+Question : Quel est le montant total des commandes dont le client est à Paris ?
+--- SQL brute ---
+SELECT SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id WHERE cl.ville = 'Paris';
+--- SQL corrigée ---
+SELECT SUM(c.montant) FROM commandes c WHERE c.client_id IN (SELECT id FROM clients WHERE ville = 'Paris');
+--- SQL validée ---
+SELECT SUM(c.montant) FROM commandes c WHERE c.client_id IN (SELECT id FROM clients WHERE ville = 'Paris')
+Temps (s) : 0.87
+
+--- Question 52 ---
+Question : Quel est le montant total des ventes par catégorie de produit ?
+--- SQL brute ---
+SELECT p.categorie, SUM(c.montant) as total_ventes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie;
+--- SQL corrigée ---
+SELECT p.categorie, SUM(c.montant) as total_ventes
+FROM produits p
+JOIN commandes c ON p.id = c.produit_id
+GROUP BY p.categorie;
+--- SQL validée ---
+SELECT p.categorie, SUM(c.montant) as total_ventes
+FROM produits p
+JOIN commandes c ON p.id = c.produit_id
+GROUP BY p.categorie
+Temps (s) : 1.36
+
+--- Question 53 ---
+Question : Donne le nombre de commandes par jour de la semaine.
+--- SQL brute ---
+SELECT DATE_FORMAT(date_commande, '%W') as jour, COUNT(*) as nombre_commandes FROM commandes GROUP BY jour;
+--- SQL corrigée ---
+SELECT DATE_FORMAT(date_commande, '%W') as jour, COUNT(*) as nombre_commandes FROM commandes GROUP BY jour;
+--- SQL validée ---
+SELECT DATE_FORMAT(date_commande, '%W') AS jour, COUNT(*) AS nombre_commandes FROM commandes GROUP BY jour
+Temps (s) : 2.95
+
+--- Question 54 ---
+Question : Quel est le produit le plus commandé en janvier 2024 ?
+--- SQL brute ---
+SELECT p.nom, SUM(c.montant) as total_commande FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom ORDER BY total_commande DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT p.nom, SUM(c.montant) as total_commande FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE c.date_commande >= '2024-01-01' AND c.date_commande < '2024-02-01' GROUP BY p.nom ORDER BY total_commande DESC LIMIT 1;
+--- SQL validée ---
+SELECT p.nom, SUM(c.montant) as total_commande FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE c.date_commande >= '2024-01-01' AND c.date_commande < '2024-02-01' GROUP BY p.nom ORDER BY total_commande DESC LIMIT 1
+Temps (s) : 2.95
+
+--- Question 55 ---
+Question : Combien de clients différents ont commandé chaque produit ?
+--- SQL brute ---
+SELECT p.nom AS produit_name, COUNT(c.client_id) AS nb_clients FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.id;
+--- SQL corrigée ---
+SELECT p.nom AS produit_name, COUNT(DISTINCT c.client_id) AS nb_clients FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom;
+--- SQL validée ---
+SELECT p.nom AS produit_name, COUNT(DISTINCT c.client_id) AS nb_clients FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom
+Temps (s) : 2.95
+
+--- Question 56 ---
+Question : Quel est le montant total des commandes pour chaque fournisseur ?
+--- SQL brute ---
+SELECT clients.nom, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) 
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id 
+GROUP BY fournisseurs.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) 
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id 
+JOIN fournisseurs ON commandes.fournisseur_id = fournisseurs.id 
+GROUP BY fournisseurs.nom
+Temps (s) : 2.06
+
+--- Question 57 ---
+Question : Quel est le nombre moyen de commandes par ville ?
+--- SQL brute ---
+SELECT AVG(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.ville = 'Nantes';
+--- SQL corrigée ---
+SELECT_____________________________ FROM_____________________________ WHERE_____________________________;
+--- SQL validée ---
+SELECT AVG(montant) FROM commandes WHERE client_id = 1;
+Temps (s) : 2.96
+
+--- Question 58 ---
+Question : Quel est le montant total des commandes passées par les clients du secteur 'Education' ?
+--- SQL brute ---
+SELECT SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id WHERE cl.secteur = 'Education';
+--- SQL corrigée ---
+SELECT SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id WHERE cl.secteur = 'Education';
+--- SQL validée ---
+SELECT SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id WHERE cl.secteur = 'Education'
+Temps (s) : 1.45
+
+--- Question 59 ---
+Question : Quels sont les produits dont le prix unitaire est supérieur à 500 euros ?
+--- SQL brute ---
+SELECT produits.nom FROM produits WHERE produits.prix_unitaire > 500;
+--- SQL corrigée ---
+SELECT produits.nom 
+FROM produits 
+WHERE produits.prix_unitaire > 500;
+--- SQL validée ---
+SELECT produits.nom FROM produits WHERE produits.prix_unitaire > 500
+Temps (s) : 1.2
+
+--- Question 60 ---
+Question : Donne la liste des commandes dont le montant est inférieur à la moyenne.
+--- SQL brute ---
+SELECT clients.id, clients.ville, SUM(commandes.montant) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id HAVING SUM(commandes.montant) < (SELECT AVG(montant) FROM commandes);
+--- SQL corrigée ---
+SELECT clients.id, clients.ville, SUM(commandes.montant) 
+FROM clients 
+INNER JOIN commandes ON clients.id = commandes.client_id 
+WHERE SUM(commandes.montant) < (SELECT SUM(commandes.montant) / COUNT(*) FROM commandes);
+--- SQL validée ---
+SELECT clients.id, clients.ville, SUM(commandes.montant) 
+FROM clients 
+INNER JOIN commandes ON clients.id = commandes.client_id 
+WHERE SUM(commandes.montant) < (SELECT AVG(montant) FROM commandes)
+Temps (s) : 3.0
+
+--- Question 61 ---
+Question : Quel est le client ayant commandé tous les produits d’une même catégorie ?
+--- SQL brute ---
+SELECT clients.id, clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id HAVING COUNT(DISTINCT produits.id) = (SELECT COUNT(*) FROM produits);
+--- SQL corrigée ---
+SELECT clients.id, clients.nom
+FROM clients
+WHERE clients.id IN (
+  SELECT commandes.client_id
+  FROM commandes
+  GROUP BY commandes.client_id
+  HAVING COUNT(DISTINCT produits.id) = (
+    SELECT COUNT(*) FROM produits
+  )
+);
+--- SQL validée ---
+SELECT clients.id, clients.nom
+FROM clients
+WHERE clients.id IN (
+Temps (s) : 3.1
+
+--- Question 62 ---
+Question : Combien de produits différents ont été vendus à chaque client ?
+--- SQL brute ---
+SELECT clients.nom, COUNT(DISTINCT produits.id) AS nombre_de_produits FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id;
+--- SQL corrigée ---
+SELECT c.nom, COUNT(DISTINCT p.id) AS nombre_de_produits
+FROM clients c
+JOIN commandes cm ON c.id = cm.client_id
+GROUP BY c.id, c.nom;
+--- SQL validée ---
+SELECT c.nom, COUNT(DISTINCT p.id) AS nombre_de_produits
+FROM clients c
+JOIN commandes cm ON c.id = cm.client_id
+Temps (s) : 2.74
+
+--- Question 63 ---
+Question : Quel est le fournisseur dont les produits ont généré le plus de chiffre d'affaires ?
+--- SQL brute ---
+SELECT fournisseurs.nom, SUM(commandes.montant) as total_gross_domicile FROM fournisseurs JOIN clients ON fournisseurs.id = clients.fournisseur_id JOIN commandes ON clients.id = commandes.client_id JOIN produits ON commandes.produit_id = produits.id GROUP BY fournisseurs.nom ORDER BY total_gross_domicile DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) as total_gross_domicile FROM fournisseurs INNER JOIN produits ON fournisseurs.id = produits.fournisseur_id INNER JOIN commandes ON produits.id = commandes.produit_id GROUP BY fournisseurs.nom ORDER BY total_gross_domicile DESC LIMIT 1;
+--- SQL validée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) as total_gross_domicile FROM fournisseurs INNER JOIN produits ON fournisseurs.id = produits.fournisseur_id INNER JOIN commandes ON produits.id = commandes.produit_id GROUP BY fournisseurs.nom ORDER BY total_gross_domicile DESC LIMIT 1
+Temps (s) : 0.91
+
+--- Question 64 ---
+Question : Liste les 20 plus grosses commandes de l'année dernière.
+--- SQL brute ---
+SELECT * FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE c.date_commande >= DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR) ORDER BY c.montant DESC LIMIT 20;
+--- SQL corrigée ---
+SELECT * FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE c.date_commande >= DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR) ORDER BY c.montant DESC LIMIT 20;
+--- SQL validée ---
+SELECT * FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE c.date_commande >= DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR) ORDER BY c.montant DESC LIMIT 20
+Temps (s) : 0.14
+
+--- Question 65 ---
+Question : Quel est le produit qui a généré le moins de chiffre d'affaires ?
+--- SQL brute ---
+SELECT produits.nom FROM produits JOIN commandes ON produits.id = commandes.produit_id JOIN clients ON commandes.client_id = clients.id WHERE commandes.montant = (SELECT MIN(montant) FROM commandes);
+--- SQL corrigée ---
+SELECT nom FROM produits WHERE id = (SELECT produit_id FROM commandes WHERE montant = (SELECT MIN(montant) FROM commandes));
+--- SQL validée ---
+SELECT nom FROM produits WHERE id = (SELECT produit_id FROM commandes WHERE montant = (SELECT MIN(montant) FROM commandes)
+Temps (s) : 2.97
+
+--- Question 66 ---
+Question : Donne la liste des clients qui n'ont commandé que des produits de la catégorie 'Bureautique'.
+--- SQL brute ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE produits.categorie = 'Bureautique' GROUP BY clients.nom HAVING COUNT(DISTINCT produits.id) = (SELECT COUNT(*) FROM produits WHERE categorie = 'Bureautique')
+--- SQL corrigée ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE produits.categorie = 'Bureautique' GROUP BY clients.nom HAVING COUNT(DISTINCT produits.id) = (SELECT COUNT(*) FROM produits WHERE categorie = 'Bureautique')
+--- SQL validée ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE produits.categorie = 'Bureautique'
+Temps (s) : 2.97
+
+--- Question 67 ---
+Question : Combien de commandes ont été annulées ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes WHERE date_commande < DATE_SUB(CURRENT_DATE, INTERVAL 1 MONTH) AND id IN (SELECT produit_id FROM commandes GROUP BY produit_id HAVING COUNT(*) = (SELECT MAX(compte) FROM (SELECT produit_id, COUNT(*) AS compte FROM commandes GROUP BY produit_id) AS sous_table));
+--- SQL corrigée ---
+SELECT COUNT(*) 
+FROM commandes 
+WHERE date_commande < DATE_SUB(CURRENT_DATE, INTERVAL 1 MONTH);
+--- SQL validée ---
+SELECT COUNT(*) 
+FROM commandes 
+WHERE date_commande < DATE_SUB(CURRENT_DATE, INTERVAL 1 MONTH)
+Temps (s) : 2.96
+
+--- Question 68 ---
+Question : Quel est le montant total des commandes par jour de la semaine en 2023 ?
+--- SQL brute ---
+SELECT DATE_FORMAT(c.date_commande, '%W') as jour, SUM(c.montant) as total_commandes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY jour;
+--- SQL corrigée ---
+SELECT 
+  DATE_FORMAT(c.date_commande, '%u') AS jour_semaine, 
+  SUM(c.montant) AS total_commandes
+FROM 
+  commandes c
+GROUP BY 
+  jour_semaine;
+--- SQL validée ---
+SELECT 
+  DATE_FORMAT(c.date_commande, '%u') AS jour_semaine, 
+  SUM(c.montant) AS total_commandes
+Temps (s) : 2.96
+
+--- Question 69 ---
+Question : Quel est le secteur qui a le moins de clients ?
+--- SQL brute ---
+SELECT clients.secteur FROM clients JOIN commandes ON clients.id = commandes.client_id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur ORDER BY COUNT(*) ASC LIMIT 1;
+--- SQL corrigée ---
+SELECT 
+  secteur
+FROM 
+  clients 
+WHERE 
+  id = (SELECT 
+          client_id 
+        FROM 
+          commandes 
+        GROUP BY 
+          client_id 
+        ORDER BY 
+          COUNT(*) ASC 
+        LIMIT 1);
+--- SQL validée ---
+SELECT 
+  secteur
+FROM 
+  clients
+WHERE 
+  id = (SELECT 
+          client_id 
+        FROM 
+          commandes 
+        GROUP BY 
+          client_id 
+        ORDER BY 
+          COUNT(*) ASC 
+        LIMIT 1)
+Temps (s) : 2.96
+
+--- Question 70 ---
+Question : Quel est le nombre de fournisseurs par pays ?
+--- SQL brute ---
+SELECT clients.secteur, COUNT(DISTINCT fournisseurs.id) as nombre_fournisseurs FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY clients.secteur;
+--- SQL corrigée ---
+SELECT clients.secteur, COUNT(DISTINCT fournisseurs.id) as nombre_fournisseurs FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY clients.secteur;
+--- SQL validée ---
+SELECT clients.secteur, COUNT(DISTINCT fournisseurs.id) AS nombre_fournisseurs FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY clients.secteur
+Temps (s) : 0.66
+
+--- Question 71 ---
+Question : Quel est le montant total des commandes ayant été payées en espèces ?
+--- SQL brute ---
+SELECT SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE p.categorie = 'especes';
+--- SQL corrigée ---
+SELECT 
+    SUM(c.montant) 
+FROM 
+    commandes c 
+WHERE 
+    c.montant IS NOT NULL;
+--- SQL validée ---
+SELECT SUM(c.montant) FROM commandes c WHERE c.montant IS NOT NULL
+Temps (s) : 0.4
+
+--- Question 72 ---
+Question : Combien de produits référencés n'ont jamais été commandés ?
+--- SQL brute ---
+SELECT COUNT(DISTINCT p.id) FROM produits p LEFT JOIN commandes c ON p.id = c.produit_id WHERE c.id IS NULL;
+--- SQL corrigée ---
+SELECT COUNT(DISTINCT p.id)
+FROM produits p
+WHERE p.id NOT IN (SELECT c.produit_id FROM commandes c);
+--- SQL validée ---
+SELECT COUNT(DISTINCT p.id)
+FROM produits p
+WHERE p.id NOT IN (SELECT c.produit_id FROM commandes c);
+Temps (s) : 2.52
+
+--- Question 73 ---
+Question : Donne la liste des commandes passées le jour du 1er mai.
+--- SQL brute ---
+SELECT t3.nom FROM commandes AS t1 INNER JOIN clients AS t2 ON t1.client_id = t2.id INNER JOIN produits AS t3 ON t1.produit_id = t3.id WHERE t1.date_commande = '2022-05-01';
+--- SQL corrigée ---
+SELECT * FROM commandes WHERE date_commande = '2022-05-01';
+--- SQL validée ---
+SELECT * FROM commandes WHERE date_commande = '2022-05-01
+Temps (s) : 2.97
+
+--- Question 74 ---
+Question : Quel est le client qui a passé la commande la plus chère ?
+--- SQL brute ---
+SELECT clients.nom FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id WHERE commandes.montant = (SELECT MAX(montant) FROM commandes);
+--- SQL corrigée ---
+SELECT 
+  c.nom 
+FROM 
+  commandes 
+JOIN 
+  clients c ON commandes.client_id = c.id 
+WHERE 
+  commandes.montant = (SELECT MAX(montant) FROM commandes);
+--- SQL validée ---
+SELECT 
+  c.nom 
+FROM 
+  commandes 
+JOIN 
+  clients c ON commandes.client_id = c.id
+Temps (s) : 1.6
+
+--- Question 75 ---
+Question : Quel est le produit le plus vendu à Paris ?
+--- SQL brute ---
+SELECT p.nom, p.prix_unitaire FROM produits p JOIN commandes c ON p.id = c.produit_id JOIN clients cl ON c.client_id = cl.id WHERE cl.ville = 'Paris' GROUP BY p.nom ORDER BY SUM(c.montant) DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT p.nom, SUM(c.montant) AS total_vendu
+FROM produits p
+JOIN commandes c ON p.id = c.produit_id
+JOIN clients cl ON c.client_id = cl.id
+WHERE cl.ville = 'Paris'
+GROUP BY p.nom
+ORDER BY total_vendu DESC
+LIMIT 1;
+--- SQL validée ---
+SELECT p.nom, SUM(c.montant) AS total_vendu
+FROM produits p
+JOIN commandes c ON p.id = c.produit_id
+JOIN clients cl ON c.client_id = cl.id
+WHERE cl.ville = 'Paris'
+GROUP BY p.nom
+ORDER BY total_vendu DESC
+LIMIT 1
+Temps (s) : 1.1
+
+--- Question 76 ---
+Question : Combien de commandes ont été passées par chaque secteur de client ?
+--- SQL brute ---
+SELECT clients.secteur, COUNT(commandes.id) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id WHERE clients.secteur = 'Electronique' GROUP BY clients.secteur;
+--- SQL corrigée ---
+SELECT clients.secteur, COUNT(commandes.id) 
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id 
+GROUP BY clients.secteur;
+--- SQL validée ---
+SELECT clients.secteur, COUNT(commandes.id) FROM commandes 
+JOIN clients ON commandes.client_id = clients.id GROUP BY clients.secteur
+Temps (s) : 1.01
+
+--- Question 77 ---
+Question : Quel est le montant total des commandes pour chaque type de produit ?
+--- SQL brute ---
+SELECT p.categorie, SUM(c.montant) as total_commandes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie;
+--- SQL corrigée ---
+SELECT p.categorie, SUM(c.montant) as total_commandes FROM produits p JOIN commandes c ON p.id = c.produit_id GROUP BY p.categorie;
+--- SQL validée ---
+SELECT p.categorie, SUM(c.montant) as total_commandes FROM produits p JOIN commandes c ON p.id = c.produit_id GROUP BY p.categorie
+Temps (s) : 0.57
+
+--- Question 78 ---
+Question : Donne la liste des produits commandés par plus de 5 clients différents en 2023.
+--- SQL brute ---
+SELECT p.nom, COUNT(DISTINCT c.client_id) as nombre_commandes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom HAVING nombre_commandes > 5;
+--- SQL corrigée ---
+SELECT p.nom, COUNT(DISTINCT c.client_id) as nombre_commandes FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE c.date_commande >= '2023-01-01' AND c.date_commande < '2023-12-31' GROUP BY p.nom HAVING COUNT(DISTINCT c.client_id) > 5;
+--- SQL validée ---
+SELECT p.nom, COUNT(DISTINCT c.client_id) as nombre_commandes FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE c.date_commande >= '2023-01-01' AND c.date_commande < '2023-12-31' GROUP BY p.nom HAVING COUNT(DISTINCT c.client_id) > 5
+Temps (s) : 1.0
+
+--- Question 79 ---
+Question : Quel est le chiffre d'affaires total par mois et par fournisseur ?
+--- SQL brute ---
+SELECT clients.nom, DATE_TRUNC('month', commandes.date_commande) AS mois, fournisseurs.nom AS fournisseur, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY clients.nom, mois, fournisseurs.nom;
+--- SQL corrigée ---
+SELECT fournisseurs.nom AS fournisseur, DATE_TRUNC('month', commandes.date_commande) AS mois, SUM(commandes.montant) AS chiffre_affaires FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom, mois;
+--- SQL validée ---
+SELECT fournisseurs.nom AS fournisseur, DATE_TRUNC('month', commandes.date_commande) AS mois, SUM(commandes.montant) AS chiffre_affaires FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom, mois
+Temps (s) : 2.29
+
+--- Question 80 ---
+Question : Liste les clients ayant passé des commandes chaque trimestre de 2023.
+--- SQL brute ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom HAVING COUNT(DISTINCT MONTH(commandes.date_commande)) / 3 = 1;
+--- SQL corrigée ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom HAVING COUNT(DISTINCT MONTH(commandes.date_commande)) / 3 = 1;
+--- SQL validée ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom HAVING COUNT(DISTINCT MONTH(commandes.date_commande)) / 3 = 1
+Temps (s) : 0.23
+
+--- Question 81 ---
+Question : Combien de commandes ont été passées entre le 1er juin et le 30 juin ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes AS cmd JOIN clients AS cl ON cmd.client_id = cl.id JOIN produits AS p ON cmd.produit_id = p.id WHERE cmd.date_commande BETWEEN '2022-06-01' AND '2022-06-30';
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande BETWEEN '2022-06-01' AND '2022-06-30';
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande BETWEEN '2022-06-01' AND '2022-06-30'
+Temps (s) : 2.99
+
+--- Question 82 ---
+Question : Quel est le produit le plus commandé chaque trimestre ?
+--- SQL brute ---
+SELECT p.nom AS produit, f.nom AS fournisseur, QUARTER(c.date_commande) AS trimestre, SUM(c.montant) AS total_commandé FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id LEFT JOIN fournisseurs f ON p.fournisseur_id = f.id GROUP BY p.nom, f.nom, QUARTER(c.date_commande) ORDER BY total_commandé DESC;
+--- SQL corrigée ---
+SELECT p.nom AS produit, COUNT(*) AS total_commandé FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE QUARTER(c.date_commande) = 1 GROUP BY p.nom ORDER BY total_commandé DESC;
+--- SQL validée ---
+SELECT p.nom AS produit, COUNT(*) AS total_commandé FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE QUARTER(c.date_commande) = 1 GROUP BY p.nom ORDER BY total_commandé DESC
+Temps (s) : 3.0
+
+--- Question 83 ---
+Question : Quel est le montant total des commandes pour chaque fournisseur en 2023 ?
+--- SQL brute ---
+SELECT f.nom as fournisseur, p.nom as produit, SUM(c.montant) as total_commandes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id JOIN fournisseurs f ON p.fournisseur_id = f.id GROUP BY f.nom, p.nom;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) AS total_commandes FROM fournisseurs 
+JOIN produits ON fournisseurs.id = produits.fournisseur_id 
+JOIN commandes ON produits.id = commandes.produit_id 
+WHERE EXTRACT(YEAR FROM commandes.date_commande) = 2023 
+GROUP BY fournisseurs.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) AS total_commandes FROM fournisseurs 
+JOIN produits ON fournisseurs.id = produits.fournisseur_id 
+JOIN commandes ON produits.id = commandes.produit_id 
+WHERE EXTRACT(YEAR FROM commandes.date_commande) = 2023 
+GROUP BY fournisseurs.nom
+Temps (s) : 1.83
+
+--- Question 84 ---
+Question : Quel est le client ayant le plus commandé chaque année ?
+--- SQL brute ---
+SELECT clients.nom AS client, YEAR(commandes.date_commande) AS année, COUNT(commandes.id) AS nombre_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom, année ORDER BY nombre_commandes DESC;
+--- SQL corrigée ---
+SELECT c.nom AS client, YEAR(c.date_commande) AS année, COUNT(*) AS nombre_commandes
+FROM commandes c
+GROUP BY c.nom, YEAR(c.date_commande)
+ORDER BY COUNT(*) DESC;
+--- SQL validée ---
+SELECT c.nom AS client, YEAR(c.date_commande) AS année, COUNT(*) AS nombre_commandes
+FROM commandes c
+GROUP BY c.nom, YEAR(c.date_commande)
+Temps (s) : 3.0
+
+--- Question 85 ---
+Question : Quel est le montant moyen des commandes par fournisseur ?
+--- SQL brute ---
+SELECT fournisseurs.nom, AVG(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom;
+--- SQL corrigée ---
+INSERT INTO fournisseurs VALUES (1, 'Fournisseur A', 'France', 'Gros épicier');
+--- SQL validée ---
+SELECT AVG(montant) FROM commandes AS T1 JOIN fournisseurs AS T2 ON T1.fournisseur_id = T2.id
+Temps (s) : 2.99
+
+--- Question 86 ---
+Question : Combien de commandes ont été livrées à l'heure ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes WHERE date_commande = (SELECT MAX(date_commande) FROM commandes);
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande = (SELECT MAX(date_commande) FROM commandes);
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande = (SELECT MAX(date_commande) FROM commandes)
+Temps (s) : 2.98
+
+--- Question 87 ---
+Question : Donne la liste des clients qui n'ont commandé que des produits de la catégorie 'Informatique'.
+--- SQL brute ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE produits.categorie = 'Informatique' GROUP BY clients.nom HAVING COUNT(DISTINCT produits.id) = (SELECT COUNT(*) FROM produits WHERE categorie = 'Informatique');
+--- SQL corrigée ---
+SELECT 
+  nom 
+FROM 
+  clients 
+WHERE 
+  id IN (SELECT client_id FROM commandes WHERE produit_id IN (SELECT id FROM produits WHERE categorie = 'Informatique'));
+--- SQL validée ---
+SELECT 
+  nom 
+FROM 
+  clients 
+WHERE 
+  id IN (SELECT client_id FROM commandes WHERE produit_id IN (SELECT id FROM produits WHERE categorie = 'Computerism'));
+Temps (s) : 3.0
+
+--- Question 88 ---
+Question : Combien de fournisseurs différents ont été sollicités par chaque client ?
+--- SQL brute ---
+SELECT c.client_id, COUNT(DISTINCT f.id) as nombre_fournisseurs FROM commandes c JOIN produits p ON c.produit_id = p.id JOIN fournisseurs f ON p.fournisseur_id = f.id GROUP BY c.client_id;
+--- SQL corrigée ---
+SELECT c.client_id, COUNT(DISTINCT f.id) as nombre_fournisseurs FROM clients c LEFT JOIN commandes cm ON c.id = cm.client_id LEFT JOIN produits p ON cm.produit_id = p.id LEFT JOIN fournisseurs f ON p.fournisseur_id = f.id GROUP BY c.client_id;
+--- SQL validée ---
+SELECT c.client_id, COUNT(DISTINCT f.id) AS nombre_fournisseurs FROM clients c LEFT JOIN commandes cm ON c.id = cm.client_id LEFT JOIN produits p ON cm.produit_id = p.id LEFT JOIN fournisseurs f ON p.fournisseur_id = f.id GROUP BY c.client_id
+Temps (s) : 1.48
+
+--- Question 89 ---
+Question : Quel est le montant total des commandes passées par chaque secteur et chaque ville ?
+--- SQL brute ---
+SELECT c.ville, p.secteur, SUM(c.montant) FROM commandes c JOIN clients c ON c.client_id = c.id JOIN produits p ON c.produit_id = p.id GROUP BY c.ville, p.secteur;
+--- SQL corrigée ---
+SELECT c.ville, p.secteur, SUM(c.montant) FROM commandes c JOIN clients c ON c.client_id = c.id JOIN produits p ON c.produit_id = p.id GROUP BY c.ville, p.secteur;
+--- SQL validée ---
+SELECT c.ville, p.secteur, SUM(c.montant) FROM commandes c JOIN clients c ON c.client_id = c.id JOIN produits p ON c.produit_id = p.id GROUP BY c.ville, p.secteur
+Temps (s) : 0.94
+
+--- Question 90 ---
+Question : Liste les produits qui ont été commandés par tous les clients d'une même ville.
+--- SQL brute ---
+SELECT p.nom FROM produits p JOIN commandes c ON p.id = c.produit_id JOIN clients cl ON c.client_id = cl.id WHERE cl.ville IN (SELECT ville FROM clients GROUP BY ville HAVING COUNT(DISTINCT client_id) = (SELECT COUNT(DISTINCT client_id) FROM commandes JOIN clients ON commandes.client_id = clients.id WHERE clients.ville = ANY (SELECT ville FROM clients GROUP BY ville))) GROUP BY p.nom HAVING COUNT(DISTINCT c.id) = (SELECT COUNT(DISTINCT client_id) FROM commandes WHERE client_id IN (SELECT client_id FROM clients WHERE ville = ANY (SELECT ville FROM clients GROUP BY ville))) AND p.id IN (SELECT produit_id FROM commandes JOIN clients ON commandes.client_id = clients.id WHERE clients.ville = ANY (SELECT ville FROM clients GROUP BY ville)) GROUP BY p.nom;
+--- SQL corrigée ---
+INSERT INTO clients (id, nom, secteur, ville) VALUES (1, 'Client1', ' Secteur1', 'Paris');
+--- SQL validée ---
+SELECT T2.nom FROM commandes AS T1 JOIN clients AS T2 ON T1.client_id = T2.id JOIN produits AS T3 ON T3.id = T1.produit_id WHERE T2.ville = T1.ville
+Temps (s) : 3.0
+
+--- Question 91 ---
+Question : Quel est le montant total des ventes par catégorie et par mois ?
+--- SQL brute ---
+SELECT p.categorie, DATE_FORMAT(c.date_commande, '%Y-%m') as mois, SUM(c.montant) FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie, mois;
+--- SQL corrigée ---
+SELECT p.categorie, DATE_FORMAT(c.date_commande, '%Y-%m') as mois, SUM(c.montant) 
+FROM commandes c 
+JOIN produits p ON c.produit_id = p.id 
+GROUP BY p.categorie, DATE_FORMAT(c.date_commande, '%Y-%m');
+--- SQL validée ---
+SELECT p.categorie, DATE_FORMAT(c.date_commande, '%Y-%m') as mois, SUM(c.montant) 
+FROM commandes c 
+JOIN produits p ON c.produit_id = p.id 
+GROUP BY p.categorie, DATE_FORMAT(c.date_commande, '%Y-%m')
+Temps (s) : 3.02
+
+--- Question 92 ---
+Question : Combien de commandes ont été passées chaque mois depuis 2022 ?
+--- SQL brute ---
+SELECT EXTRACT(MONTH FROM date_commande) AS mois, COUNT(*) AS nombre_commandes FROM commandes GROUP BY mois;
+--- SQL corrigée ---
+SELECT 
+  EXTRACT(MONTH FROM c.date_commande) AS mois,
+  COUNT(*) AS nombre_commandes
+FROM 
+  commandes c
+GROUP BY 
+  EXTRACT(MONTH FROM c.date_commande);
+--- SQL validée ---
+SELECT 
+  EXTRACT(MONTH FROM c.date_commande) AS mois,
+  COUNT(*) AS nombre_commandes
+FROM 
+  commandes c
+GROUP BY 
+  EXTRACT(MONTH FROM c.date_commande)
+Temps (s) : 1.5
+
+--- Question 93 ---
+Question : Quel est le client ayant dépensé le plus par trimestre ?
+--- SQL brute ---
+SELECT clients.nom, SUM(commandes.montant) AS total_dépenses FROM commandes JOIN clients ON commandes.client_id = clients.id GROUP BY clients.id ORDER BY total_dépenses DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT clients.nom, SUM(commandes.montant) AS total_dépenses
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id 
+GROUP BY clients.nom 
+ORDER BY total_dépenses DESC 
+LIMIT 1;
+--- SQL validée ---
+SELECT clients.nom, SUM(commandes.montant) AS total_dépenses
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id 
+GROUP BY clients.nom 
+ORDER BY total_dépenses DESC 
+LIMIT 1
+Temps (s) : 2.55
+
+--- Question 94 ---
+Question : Quel est le montant total des commandes pour chaque fournisseur et chaque mois ?
+--- SQL brute ---
+SELECT clients.nom as fournisseur, EXTRACT(MONTH FROM commandes.date_commande) as mois, SUM(commandes.montant) as total_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY fournisseur, mois;
+--- SQL corrigée ---
+SELECT fournisseurs.nom as fournisseur, EXTRACT(MONTH FROM commandes.date_commande) as mois, SUM(commandes.montant) as total_commandes 
+FROM commandes 
+JOIN fournisseurs ON commandes.client_id = fournisseurs.id 
+GROUP BY fournisseurs.nom, EXTRACT(MONTH FROM commandes.date_commande);
+--- SQL validée ---
+SELECT fournisseurs.nom as fournisseur, EXTRACT(MONTH FROM commandes.date_commande) as mois, SUM(commandes.montant) as total_commandes 
+FROM commandes 
+JOIN fournisseurs ON commandes.client_id = fournisseurs.id
+Temps (s) : 0.99
+
+--- Question 95 ---
+Question : Combien de clients ont commandé des produits de plus de 1000 euros ?
+--- SQL brute ---
+SELECT COUNT(DISTINCT clients.id) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id WHERE produits.prix_unitaire > 1000;
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes WHERE montant > 1000;
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes WHERE montant > 1000
+Temps (s) : 2.99
+
+--- Question 96 ---
+Question : Quel est le montant total des commandes payées par virement bancaire ?
+--- SQL brute ---
+SELECT SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id WHERE cl.secteur = 'Banque' AND cl.ville = 'Paris';
+--- SQL corrigée ---
+SELECT
+--- SQL validée ---
+SELECT 'Not possible';
+Temps (s) : 2.99
+
+--- Question 97 ---
+Question : Quel est le produit dont le montant total commandé dépasse 5000 euros ?
+--- SQL brute ---
+SELECT produits.nom FROM produits JOIN commandes ON produits.id = commandes.produit_id JOIN clients ON commandes.client_id = clients.id WHERE commandes.montant > 5000;
+--- SQL corrigée ---
+SELECT produits.nom FROM produits JOIN commandes ON produits.id = commandes.produit_id JOIN clients ON commandes.client_id = clients.id WHERE commandes.montant > 5000;
+--- SQL validée ---
+SELECT produits.nom FROM produits JOIN commandes ON produits.id = commandes.produit_id JOIN clients ON commandes.client_id = clients.id WHERE commandes.montant > 5000
+Temps (s) : 0.59
+
+--- Question 98 ---
+Question : Liste les 5 produits ayant généré le plus de chiffre d'affaires en 2023.
+--- SQL brute ---
+SELECT p.nom, SUM(c.montant) as total_grossiste FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom ORDER BY total_grossiste DESC LIMIT 5;
+--- SQL corrigée ---
+SELECT p.nom, SUM(c.montant) as total_grossiste FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom ORDER BY total_grossiste DESC LIMIT 5;
+--- SQL validée ---
+SELECT p.nom, SUM(c.montant) AS total_grossiste FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom ORDER BY total_grossiste DESC LIMIT 5
+Temps (s) : 0.27
+
+--- Question 99 ---
+Question : Donne la liste des commandes par fournisseur, par mois et par ville.
+--- SQL brute ---
+SELECT c.fournisseur_id, EXTRACT(MONTH FROM c.date_commande) as mois, c.ville, COUNT(c.id) as nb_commandes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits pr ON c.produit_id = pr.id JOIN fournisseurs fs ON pr.fournisseur_id = fs.id GROUP BY c.fournisseur_id, mois, c.ville;
+--- SQL corrigée ---
+SELECT 
+    fs.nom as fournisseur, 
+    EXTRACT(MONTH FROM c.date_commande) as mois, 
+    c.ville, 
+    COUNT(c.id) as nb_commandes
+FROM 
+    commandes c 
+JOIN 
+    clients cl ON c.client_id = cl.id 
+JOIN 
+    produits pr ON c.produit_id = pr.id 
+JOIN 
+    fournisseurs fs ON pr.fournisseur_id = fs.id 
+GROUP BY 
+    fs.nom, 
+    mois, 
+    c.ville;
+--- SQL validée ---
+SELECT 
+    fs.nom as fournisseur, 
+    EXTRACT(MONTH FROM c.date_commande) as mois, 
+    c.ville, 
+    COUNT(c.id) as nb_commandes
+Temps (s) : 3.0
+
+--- Question 100 ---
+Question : Quel est le montant total des commandes annulées ?
+--- SQL brute ---
+SELECT SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id WHERE c.date_commande < DATE_SUB(CURRENT_DATE, INTERVAL 3 MONTH);
+--- SQL corrigée ---
+SELECT SUM(c.montant) FROM commandes c WHERE c.date_commande < DATE_SUB(CURRENT_DATE, INTERVAL 3 MONTH) AND c.etat = 'annulée';
+--- SQL validée ---
+SELECT SUM(c.montant) FROM commandes c WHERE c.date_commande < DATE_ADD(CURRENT_DATE(), -3, MONTH) AND c.etat = 'annulée';
+Temps (s) : 2.99
+
+--- Question 101 ---
+Question : Quel est le nombre de clients par pays ?
+--- SQL brute ---
+SELECT c.ville, COUNT(DISTINCT c.id) FROM clients c JOIN commandes cmd ON c.id = cmd.client_id JOIN produits p ON cmd.produit_id = p.id GROUP BY c.ville;
+--- SQL corrigée ---
+SELECT c.ville, COUNT(DISTINCT c.id) FROM clients c JOIN commandes cmd ON c.id = cmd.client_id JOIN produits p ON cmd.produit_id = p.id GROUP BY c.ville;
+--- SQL validée ---
+SELECT c.ville, COUNT(DISTINCT c.id) FROM clients AS c JOIN commandes AS cmd ON c.id = cmd.client_id JOIN produits AS p ON cmd.produit_id = p.id GROUP BY c.ville
+Temps (s) : 3.0
+
+--- Question 102 ---
+Question : Quel est le montant total des ventes par produit et par fournisseur ?
+--- SQL brute ---
+SELECT p.nom as produit, f.nom as fournisseur, SUM(c.montant) as total_ventes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id JOIN fournisseurs f ON p.fournisseur_id = f.id GROUP BY p.nom, f.nom;
+--- SQL corrigée ---
+SELECT p.nom as produit, f.nom as fournisseur, SUM(c.montant) as total_ventes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id JOIN fournisseurs f ON p.fournisseur_id = f.id GROUP BY p.nom, f.nom;
+--- SQL validée ---
+SELECT p.nom AS produit, f.nom AS fournisseur, SUM(c.montant) AS total_ventes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id JOIN fournisseurs f ON p.fournisseur_id = f.id GROUP BY p.nom, f.nom
+Temps (s) : 0.14
+
+--- Question 103 ---
+Question : Quel est le montant moyen des commandes passées par les clients de Paris ?
+--- SQL brute ---
+SELECT AVG(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.ville = 'Paris';
+--- SQL corrigée ---
+SELECT
+  AVG(c.montant) AS moyenne_montant
+FROM
+  commandes c
+WHERE
+  c.client_id IN (
+    SELECT
+      id
+    FROM
+      clients
+    WHERE
+      ville = 'Paris'
+  )
+;
+--- SQL validée ---
+SELECT AVG(c.montant) AS moyenne_montant FROM commandes c WHERE c.client_id IN (SELECT id FROM clients WHERE ville = "Paris
+Temps (s) : 2.99
+
+--- Question 104 ---
+Question : Quel est le nombre de produits référencés par fournisseur ?
+--- SQL brute ---
+SELECT f.nom AS fournisseur, COUNT(c.produit_id) AS nombre_de_produits FROM fournisseurs f JOIN commandes c ON f.id = c.fournisseur_id JOIN produits p ON c.produit_id = p.id GROUP BY f.nom;
+--- SQL corrigée ---
+SELECT fournisseurs.nom AS fournisseur, COUNT(produits.id) AS nombre_de_produits FROM fournisseurs JOIN commandes ON fournisseurs.id = commandes.fournisseur_id JOIN produits ON commandes.produit_id = produits.id GROUP BY fournisseurs.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom AS fournisseur, COUNT(produits.id) AS nombre_de_produits FROM fournisseurs JOIN commandes ON fournisseurs.id = commandes.fournisseur_id JOIN produits ON commandes.produit_id = produits.id GROUP BY fournisseurs.nom
+Temps (s) : 3.0
+
+--- Question 105 ---
+Question : Combien de produits de la catégorie 'Bureautique' ont été commandés en 2024 ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.secteur = 'Bureautique' AND YEAR(c.date_commande) = 2024 AND p.categorie = 'Bureautique';
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE p.categorie = 'Bureautique' AND YEAR(c.date_commande) = 2024;
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE p.categorie = 'Bureautique' AND YEAR(c.date_commande) = 2024
+Temps (s) : 0.6
+
+--- Question 106 ---
+Question : Quel est le chiffre d'affaires total généré par chaque catégorie de produit chaque année ?
+--- SQL brute ---
+SELECT p.categorie, YEAR(c.date_commande) as année, SUM(c.montant) as chiffre_d_affaires FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie, année;
+--- SQL corrigée ---
+INSERT INTO produits (id, nom, categorie, prix_unitaire)
+VALUES (1, 'Produit 1', 'Produit 1', 10.00),
+       (2, 'Produit 2', 'Produit 2', 20.00),
+       (3, 'Produit 3', 'Produit 3', 30.00);
+--- SQL validée ---
+SELECT categorie, SUM(prix_unitaire) FROM produits GROUP BY categorie
+Temps (s) : 3.0
+
+--- Question 107 ---
+Question : Quel est le montant total des commandes payées en carte bancaire ?
+--- SQL brute ---
+SELECT SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.ville = 'Paris' AND p.categorie = 'Ordinateurs portables';
+--- SQL corrigée ---
+SELECT SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.ville = 'Paris' AND p.categorie = 'Ordinateurs portables';
+--- SQL validée ---
+SELECT SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.ville = 'Paris' AND p.categorie = 'Ordinateurs portables'
+Temps (s) : 1.04
+
+--- Question 108 ---
+Question : Quel est le client ayant commandé le plus souvent en janvier ?
+--- SQL brute ---
+SELECT clients.nom, COUNT(*) AS commandes_en_janvier FROM commandes JOIN clients ON commandes.client_id = clients.id WHERE commandes.date_commande BETWEEN '2022-01-01' AND '2022-01-31' GROUP BY clients.nom ORDER BY commandes_en_janvier DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT clients.nom, COUNT(*) AS commandes_en_janvier FROM commandes JOIN clients ON commandes.client_id = clients.id WHERE commandes.date_commande BETWEEN '2022-01-01' AND '2022-01-31' GROUP BY clients.nom ORDER BY commandes_en_janvier DESC LIMIT 1;
+--- SQL validée ---
+SELECT clients.nom, COUNT(*) AS commandes_en_janvier FROM commandes JOIN clients ON commandes.client_id = clients.id WHERE commandes.date_commande BETWEEN '2022-01-01' AND '2022-01-31' GROUP BY clients.nom ORDER BY commandes_en_janvier DESC LIMIT 1
+Temps (s) : 1.03
+
+--- Question 109 ---
+Question : Donne la liste des produits commandés par chaque client chaque année.
+--- SQL brute ---
+SELECT clients.nom AS client, EXTRACT(YEAR FROM commandes.date_commande) AS annee, produits.nom AS produit FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY client, annee, produit;
+--- SQL corrigée ---
+SELECT 
+    c.nom AS client, 
+    EXTRACT(YEAR FROM co.date_commande) AS annee, 
+    p.nom AS produit
+FROM 
+    commandes co
+JOIN 
+    clients c ON co.client_id = c.id
+JOIN 
+    produits p ON co.produit_id = p.id
+GROUP BY 
+    c.nom, 
+    EXTRACT(YEAR FROM co.date_commande), 
+    p.nom;
+--- SQL validée ---
+SELECT 
+    c.nom AS client, 
+    EXTRACT(YEAR FROM co.date_commande) AS annee, 
+    p.nom AS produit
+Temps (s) : 1.44
+
+--- Question 110 ---
+Question : Quel est le fournisseur ayant vendu le plus de produits en 2024 ?
+--- SQL brute ---
+SELECT fournisseurs.nom FROM fournisseurs JOIN produits ON fournisseurs.id = produits.fournisseur_id JOIN commandes ON produits.id = commandes.produit_id JOIN clients ON commandes.client_id = clients.id GROUP BY fournisseurs.nom ORDER BY COUNT(*) DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT fournisseurs.nom FROM fournisseurs JOIN produits ON fournisseurs.id = produits.fournisseur_id JOIN commandes ON produits.id = commandes.produit_id GROUP BY fournisseurs.nom ORDER BY SUM(commandes.montant) DESC LIMIT 1;
+--- SQL validée ---
+SELECT fournisseurs.nom FROM fournisseurs JOIN produits ON fournisseurs.id = produits.fournisseur_id JOIN commandes ON produits.id = commandes.produit_id GROUP BY fournisseurs.nom ORDER BY SUM(commandes.montant) DESC LIMIT 1
+Temps (s) : 2.86
+
+--- Question 111 ---
+Question : Quel est le montant total des commandes pour chaque client et chaque catégorie ?
+--- SQL brute ---
+SELECT c.client_id, p.categorie, SUM(c.montant) as total_commandes FROM commandes c INNER JOIN clients cl ON c.client_id = cl.id INNER JOIN produits p ON c.produit_id = p.id GROUP BY c.client_id, p.categorie;
+--- SQL corrigée ---
+SELECT c.client_id, p.categorie, SUM(c.montant) as total_commandes FROM commandes c INNER JOIN clients cl ON c.client_id = cl.id INNER JOIN produits p ON c.produit_id = p.id GROUP BY c.client_id, p.categorie;
+--- SQL validée ---
+SELECT c.client_id, p.categorie, SUM(c.montant) as total_commandes FROM commandes c INNER JOIN clients cl ON c.client_id = cl.id INNER JOIN produits p ON c.produit_id = p.id GROUP BY c.client_id, p.categorie
+Temps (s) : 0.18
+
+--- Question 112 ---
+Question : Liste les clients qui ont commandé des produits de plus de 2000 euros.
+--- SQL brute ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE produits.prix_unitaire > 2000 GROUP BY clients.nom;
+--- SQL corrigée ---
+SELECT 
+  clients.nom
+FROM 
+  clients
+WHERE 
+  id IN (
+    SELECT 
+      client_id
+    FROM 
+      commandes
+    WHERE 
+      montant > 2000
+  );
+--- SQL validée ---
+SELECT 
+  clients.nom
+FROM 
+  clients
+WHERE 
+  id IN (
+    SELECT 
+      client_id
+    FROM 
+      commandes
+    WHERE 
+      montant > 2000
+  )
+Temps (s) : 1.59
+
+--- Question 113 ---
+Question : Quel est le produit le plus commandé chaque mois ?
+--- SQL brute ---
+SELECT p.nom as produit_nom, SUM(c.montant) as total_commande FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom ORDER BY total_commande DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT p.nom as produit_nom, SUM(c.montant) as total_commande FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom ORDER BY total_commande DESC LIMIT 1;
+--- SQL validée ---
+SELECT p.nom, SUM(c.montant) AS total_commande FROM commandes AS c JOIN produits AS p ON c.produit_id = p.id GROUP BY p.nom ORDER BY total_commande DESC LIMIT 1
+Temps (s) : 0.72
+
+--- Question 114 ---
+Question : Combien de fournisseurs différents ont vendu des produits à chaque client ?
+--- SQL brute ---
+SELECT clients.id, COUNT(DISTINCT fournisseurs.id) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY clients.id;
+--- SQL corrigée ---
+SELECT clients.id, COUNT(DISTINCT fournisseurs.id) FROM clients
+JOIN (
+  SELECT client_id, COUNT(DISTINCT fournisseurs.id) AS fournisseurs_count
+  FROM commandes
+  JOIN produits ON commandes.produit_id = produits.id
+  JOIN fournisseurs ON produits.id = fournisseurs.id
+  GROUP BY commandes.client_id
+) AS fournisseurs_per_client ON clients.id = fournisseurs_per_client.client_id
+GROUP BY clients.id;
+--- SQL validée ---
+SELECT clients.id, COUNT(DISTINCT fournisseurs.id) FROM clients JOIN (
+Temps (s) : 3.0
+
+--- Question 115 ---
+Question : Quel est le montant total des commandes pour chaque produit, chaque fournisseur et chaque mois ?
+--- SQL brute ---
+SELECT clients.nom, fournisseurs.nom AS fournisseur, MONTH(commandes.date_commande) AS mois, SUM(commandes.montant) AS total_commandes FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY clients.nom, fournisseurs.nom, mois;
+--- SQL corrigée ---
+SELECT fournisseurs.nom AS fournisseur, MONTH(commandes.date_commande) AS mois, produits.nom AS produit, SUM(commandes.montant) AS total_commandes FROM commandes INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom, mois, produits.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom AS fournisseur, MONTH(commandes.date_commande) AS mois, produits.nom AS produit, SUM(commandes.montant) AS total_commandes FROM commandes INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom, mois, produits.nom
+Temps (s) : 3.0
+
+--- Question 116 ---
+Question : Liste les clients qui n'ont jamais commandé de produit de la catégorie 'Informatique'.
+--- SQL brute ---
+SELECT clients.nom FROM clients LEFT JOIN commandes ON clients.id = commandes.client_id LEFT JOIN produits ON commandes.produit_id = produits.id WHERE produits.categorie != 'Informatique' GROUP BY clients.nom HAVING COUNT(DISTINCT produits.id) = 0;
+--- SQL corrigée ---
+SELECT clients.nom FROM clients LEFT JOIN commandes ON clients.id = commandes.client_id LEFT JOIN produits ON commandes.produit_id = produits.id WHERE produits.categorie != 'Informatique' GROUP BY clients.nom HAVING COUNT(DISTINCT produits.id) = 0;
+--- SQL validée ---
+SELECT clients.nom FROM clients LEFT JOIN commandes ON clients.id = commandes.client_id LEFT JOIN produits ON commandes.produit_id = produits.id WHERE produits.categorie != 'Informatique' GROUP BY clients.nom HAVING COUNT(DISTINCT produits.id) = 0
+Temps (s) : 0.14
+
+--- Question 117 ---
+Question : Quel est le nombre de commandes passées chaque semaine en 2023 ?
+--- SQL brute ---
+SELECT DATE_TRUNC('week', date_commande) as semaine, COUNT(*) as nombre_commandes FROM commandes GROUP BY semaine ORDER BY semaine;
+--- SQL corrigée ---
+SELECT DATE_TRUNC('week', date_commande) as semaine, COUNT(*) as nombre_commandes 
+FROM commandes 
+WHERE date_commande >= '2023-01-01' AND date_commande < '2024-01-01' 
+GROUP BY semaine 
+ORDER BY semaine;
+--- SQL validée ---
+SELECT DATE_TRUNC('week', date_commande) as semaine, COUNT(*) as nombre_commandes 
+FROM commandes 
+WHERE date_commande >= '2023-01-01' AND date_commande < '2024-01-01' 
+GROUP BY semaine
+Temps (s) : 0.94
+
+--- Question 118 ---
+Question : Quel est le client ayant commandé le plus de produits différents par mois ?
+--- SQL brute ---
+SELECT clients.nom, EXTRACT(MONTH FROM commandes.date_commande) as mois, COUNT(DISTINCT produits.id) as nombre_produits FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom, mois ORDER BY nombre_produits DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT clients.nom, EXTRACT(MONTH FROM commandes.date_commande) as mois, COUNT(DISTINCT produits.id) as nombre_produits FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom, mois ORDER BY nombre_produits DESC LIMIT 1;
+--- SQL validée ---
+SELECT clients.nom, EXTRACT(MONTH FROM commandes.date_commande) as mois, COUNT(DISTINCT produits.id) as nombre_produits FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom, mois ORDER BY nombre_produits DESC LIMIT 1
+Temps (s) : 0.14
+
+--- Question 119 ---
+Question : Combien de commandes ont été passées par les clients du secteur 'Santé' ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes AS cmd JOIN clients AS cl ON cmd.client_id = cl.id JOIN produits AS p ON cmd.produit_id = p.id WHERE cl.secteur = 'Santé';
+--- SQL corrigée ---
+SELECT COUNT(*)
+FROM commandes AS cmd
+JOIN clients AS cl ON cmd.client_id = cl.id
+WHERE cl.secteur = 'Santé';
+--- SQL validée ---
+SELECT COUNT(*)
+Temps (s) : 2.99
+
+--- Question 120 ---
+Question : Quel est le montant moyen des commandes annulées ?
+--- SQL brute ---
+SELECT AVG(montant) FROM commandes WHERE date_commande < '2022-01-01';
+--- SQL corrigée ---
+SELECT AVG(montant) FROM commandes WHERE date_commande < '2022-01-01';
+--- SQL validée ---
+SELECT AVG(montant) FROM commandes WHERE date_commande < '2022-01-01'
+Temps (s) : 0.14
+
+--- Question 121 ---
+Question : Quel est le fournisseur dont les produits n'ont jamais été commandés ?
+--- SQL brute ---
+SELECT fournisseurs.nom FROM fournisseurs LEFT JOIN produits ON fournisseurs.id = produits.fournisseur_id LEFT JOIN commandes ON produits.id = commandes.produit_id WHERE commandes.id IS NULL;
+--- SQL corrigée ---
+SELECT DISTINCT fournisseurs.nom
+FROM fournisseurs
+LEFT JOIN produits ON fournisseurs.id = produits.fournisseur_id
+WHERE produits.id IS NULL;
+--- SQL validée ---
+SELECT DISTINCT fournisseurs.nom
+FROM fournisseurs
+LEFT JOIN produits ON fournisseurs.id = produits.fournisseur_id
+Temps (s) : 2.99
+
+--- Question 122 ---
+Question : Liste les commandes passées le dernier jour de chaque mois.
+--- SQL brute ---
+SELECT * FROM commandes WHERE date_commande = (SELECT MAX(date_commande) FROM commandes GROUP BY EXTRACT(MONTH FROM date_commande));
+--- SQL corrigée ---
+SELECT * FROM commandes WHERE date_commande = (SELECT MAX(date_commande) FROM commandes WHERE date_commande = DATE_TRUNC('month', date_commande));
+--- SQL validée ---
+SELECT * FROM commandes WHERE date_commande = (SELECT MAX(date_commande) FROM commandes);
+Temps (s) : 2.99
+
+--- Question 123 ---
+Question : Quel est le montant total des commandes pour chaque catégorie et chaque ville ?
+--- SQL brute ---
+SELECT c.ville, p.categorie, SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.ville, p.categorie;
+--- SQL corrigée ---
+SELECT c.ville, p.categorie, SUM(c.montant) FROM commandes c 
+JOIN clients cl ON c.client_id = cl.id 
+JOIN produits p ON c.produit_id = p.id 
+GROUP BY c.ville, p.categorie;
+--- SQL validée ---
+SELECT c.ville, p.categorie, SUM(c.montant) FROM commandes c 
+JOIN clients cl ON c.client_id = cl.id 
+JOIN produits p ON c.produit_id = p.id 
+GROUP BY c.ville, p.categorie
+Temps (s) : 0.8
+
+--- Question 124 ---
+Question : Combien de produits différents ont été commandés par chaque fournisseur ?
+--- SQL brute ---
+SELECT fournisseurs.nom, COUNT(DISTINCT produits.id) AS nombre_produits FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, COUNT(DISTINCT produits.id) AS nombre_produits 
+FROM fournisseurs 
+JOIN produits ON produits.id IN (SELECT produit_id FROM commandes WHERE commandes.client_id IN (SELECT id FROM clients)) 
+GROUP BY fournisseurs.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom, COUNT(DISTINCT produits.id) AS nombre_produits FROM fournisseurs JOIN produits ON produits.id IN (SELECT produit_id FROM commandes WHERE commandes.client_id IN (SELECT id FROM clients)) GROUP BY fournisseurs.nom
+Temps (s) : 1.07
+
+--- Question 125 ---
+Question : Quel est le chiffre d'affaires total par ville et par secteur ?
+--- SQL brute ---
+SELECT c.ville, p.categorie, SUM(c.montant) as total_affaires FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.ville, p.categorie;
+--- SQL corrigée ---
+SELECT 
+  c.ville, 
+  p.categorie, 
+  SUM(c.montant) as total_affaires 
+FROM 
+  commandes c 
+  JOIN clients cl ON c.client_id = cl.id 
+  JOIN produits p ON c.produit_id = p.id 
+GROUP BY 
+  c.ville, 
+  p.categorie;
+--- SQL validée ---
+SELECT 
+  c.ville, 
+  p.categorie, 
+  SUM(c.montant) as total_affaires 
+FROM 
+  commandes c 
+  JOIN clients cl ON c.client_id = cl.id 
+  JOIN produits p ON c.produit_id = p.id 
+GROUP BY 
+  c.ville, 
+  p.categorie
+Temps (s) : 1.9
+
+--- Question 126 ---
+Question : Quel est le client ayant passé le plus de commandes en 2024 ?
+--- SQL brute ---
+SELECT clients.nom, COUNT(DISTINCT commandes.id) AS nombre_commandes FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE commandes.date_commande >= '2024-01-01' AND commandes.date_commande < '2025-01-01' GROUP BY clients.nom ORDER BY nombre_commandes DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT clients.nom, COUNT(*) AS nombre_commandes
+FROM clients
+JOIN commandes ON clients.id = commandes.client_id
+WHERE commandes.date_commande >= '2024-01-01' AND commandes.date_commande < '2025-01-01'
+GROUP BY clients.nom
+ORDER BY nombre_commandes DESC
+LIMIT 1;
+--- SQL validée ---
+SELECT clients.nom, COUNT(*) AS nombre_commandes
+FROM clients
+JOIN commandes ON clients.id = commandes.client_id
+WHERE commandes.date_commande >= '2024-01-01' AND commandes.date_commande < '2025-01-01'
+GROUP BY clients.nom
+ORDER BY nombre_commandes DESC
+LIMIT 1
+Temps (s) : 3.0
+
+--- Question 127 ---
+Question : Donne la liste des produits commandés uniquement par un seul client.
+--- SQL brute ---
+SELECT p.nom FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.nom = (SELECT nom FROM clients GROUP BY nom ORDER BY COUNT(*) DESC LIMIT 1);
+--- SQL corrigée ---
+SELECT p.nom FROM produits p WHERE p.id IN (SELECT produit_id FROM commandes c JOIN clients cl ON c.client_id = cl.id GROUP BY c.produit_id HAVING COUNT(DISTINCT c.client_id) = 1);
+--- SQL validée ---
+SELECT p.nom FROM produits p WHERE p.id IN (SELECT produit_id FROM commandes c JOIN clients cl ON c.client_id = cl.id GROUP BY c.produit_id HAVING COUNT(DISTINCT c.client_id) = 1)
+Temps (s) : 3.0
+
+--- Question 128 ---
+Question : Quel est le nombre de commandes passées par les clients du secteur 'BTP' ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes AS c JOIN clients AS cl ON c.client_id = cl.id JOIN produits AS p ON c.produit_id = p.id WHERE cl.secteur = 'BTP';
+--- SQL corrigée ---
+SELECT
+--- SQL validée ---
+SELECT COUNT(DISTINCT (date_commande)) FROM commandes WHERE client_id IN (SELECT id FROM clients WHERE secteur = "BTP"
+Temps (s) : 1.46
+
+--- Question 129 ---
+Question : Quel est le fournisseur ayant vendu le plus de produits différents ?
+--- SQL brute ---
+SELECT fournisseurs.nom, COUNT(DISTINCT produits.id) as nombre_produits_différents FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom ORDER BY nombre_produits_différents DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, COUNT(DISTINCT produits.id) as nombre_produits_différents FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom ORDER BY nombre_produits_différents DESC LIMIT 1;
+--- SQL validée ---
+SELECT fournisseurs.nom, COUNT(DISTINCT produits.id) AS nombre_produits_différents FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom ORDER BY nombre_produits_différents DESC LIMIT 1
+Temps (s) : 0.2
+
+--- Question 130 ---
+Question : Liste les 10 produits les moins commandés.
+--- SQL brute ---
+SELECT p.nom, p.categorie FROM produits p JOIN commandes c ON p.id = c.produit_id JOIN clients cl ON c.client_id = cl.id WHERE cl.ville = 'Nantes' GROUP BY p.nom ORDER BY COUNT(*) ASC LIMIT 10;
+--- SQL corrigée ---
+SELECT p.nom, p.categorie FROM produits p JOIN commandes c ON p.id = c.produit_id JOIN clients cl ON c.client_id = cl.id WHERE cl.ville = 'Nantes' GROUP BY p.nom ORDER BY COUNT(*) ASC LIMIT 10;
+--- SQL validée ---
+SELECT p.nom, p.categorie FROM produits p JOIN commandes c ON p.id = c.produit_id JOIN clients cl ON c.client_id = cl.id WHERE cl.ville = 'Nantes' GROUP BY p.nom ORDER BY COUNT(*) LIMIT 10
+Temps (s) : 0.14
+
+--- Question 131 ---
+Question : Quel est le montant total des commandes pour chaque ville et chaque mois ?
+--- SQL brute ---
+SELECT c.ville, EXTRACT(MONTH FROM c.date_commande) as mois, SUM(c.montant) as total_commandes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.ville, mois;
+--- SQL corrigée ---
+SELECT 
+  cl.ville, 
+  EXTRACT(MONTH FROM c.date_commande) as mois, 
+  SUM(c.montant) as total_commandes
+FROM 
+  commandes c 
+  JOIN clients cl ON c.client_id = cl.id
+GROUP BY 
+  cl.ville, 
+  EXTRACT(MONTH FROM c.date_commande)
+--- SQL validée ---
+SELECT 
+  cl.ville, 
+  EXTRACT(MONTH FROM c.date_commande) AS mois, 
+  SUM(c.montant) AS total_commandes
+FROM 
+  commandes c 
+  JOIN clients cl ON c.client_id = cl.id
+GROUP BY 
+  cl.ville, 
+  EXTRACT(MONTH FROM c.date_commande)
+Temps (s) : 2.25
+
+--- Question 132 ---
+Question : Donne la liste des clients n'ayant jamais commandé de produits du fournisseur 'ABC'.
+--- SQL brute ---
+SELECT clients.nom FROM clients LEFT JOIN commandes ON clients.id = commandes.client_id LEFT JOIN produits ON commandes.produit_id = produits.id LEFT JOIN fournisseurs ON produits.id = fournisseurs.id WHERE fournisseurs.nom IS NULL GROUP BY clients.nom HAVING COUNT(DISTINCT clients.id) = 0;
+--- SQL corrigée ---
+SELECT c.nom
+FROM clients c
+WHERE c.id NOT IN (
+  SELECT client_id
+  FROM commandes
+  WHERE produit_id IN (
+    SELECT id
+    FROM produits
+    WHERE id IN (
+      SELECT produit_id
+      FROM fournisseurs
+      WHERE nom = 'ABC'
+    )
+  )
+);
+--- SQL validée ---
+SELECT c.nom
+FROM clients c
+WHERE c.id NOT IN (
+  SELECT client_id
+  FROM commandes
+  WHERE produit_id IN (
+    SELECT id
+    FROM produits
+    WHERE id IN (
+      SELECT produit_id
+      FROM fournisseurs
+      WHERE nom = 'ABC'
+    )
+  )
+Temps (s) : 1.51
+
+--- Question 133 ---
+Question : Quel est le montant total des commandes pour chaque trimestre ?
+--- SQL brute ---
+SELECT DATE_TRUNC('quarter', c.date_commande) AS trimestre, SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY trimestre;
+--- SQL corrigée ---
+SELECT DATE_TRUNC('quarter', c.date_commande) AS trimestre, SUM(c.montant) FROM commandes c GROUP BY DATE_TRUNC('quarter', c.date_commande);
+--- SQL validée ---
+SELECT DATE_TRUNC('quarter', c.date_commande) AS trimestre, SUM(c.montant) FROM commandes c GROUP BY DATE_TRUNC('quarter', c.date_commande
+Temps (s) : 3.08
+
+--- Question 134 ---
+Question : Combien de clients ont commandé au moins une fois chaque année depuis 2020 ?
+--- SQL brute ---
+SELECT clients.nom, COUNT(DISTINCT YEAR(commandes.date_commande)) AS années FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom HAVING COUNT(DISTINCT YEAR(commandes.date_commande)) >= 2020;
+--- SQL corrigée ---
+SELECT clients.nom, COUNT(DISTINCT YEAR(commandes.date_commande)) AS années FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom HAVING COUNT(DISTINCT YEAR(commandes.date_commande)) >= 2020;
+--- SQL validée ---
+SELECT clients.nom, COUNT(DISTINCT YEAR(commandes.date_commande)) AS années FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom HAVING COUNT(DISTINCT YEAR(commandes.date_commande)) >= 2020
+Temps (s) : 0.92
+
+--- Question 135 ---
+Question : Quel est le montant total des commandes pour chaque catégorie, chaque année et chaque fournisseur ?
+--- SQL brute ---
+SELECT c.date_commande, p.categorie, f.pays, SUM(c.montant) FROM commandes c JOIN produits p ON c.produit_id = p.id JOIN fournisseurs f ON p.fournisseur_id = f.id GROUP BY c.date_commande, p.categorie, f.pays;
+--- SQL corrigée ---
+SELECT c.date_commande, p.categorie, f.pays, SUM(c.montant) 
+FROM commandes c 
+JOIN produits p ON c.produit_id = p.id 
+JOIN fournisseurs f ON p.categorie = f.categorie_fournisseur 
+GROUP BY c.date_commande, p.categorie, f.pays;
+--- SQL validée ---
+SELECT c.date_commande, p.categorie, f.pays, SUM(c.montant)
+Temps (s) : 1.46
+
+--- Question 136 ---
+Question : Liste les clients ayant commandé des produits de la catégorie 'Informatique' en 2024.
+--- SQL brute ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE produits.categorie = 'Informatique' AND commandes.date_commande BETWEEN '2024-01-01' AND '2024-12-31';
+--- SQL corrigée ---
+SELECT 
+  c.nom 
+FROM 
+  clients c 
+WHERE 
+  EXISTS 
+  (SELECT 
+     1 
+   FROM 
+     commandes cm 
+   WHERE 
+     cm.client_id = c.id 
+     AND cm.date_commande BETWEEN '2024-01-01' AND '2024-12-31' 
+     AND cm.produit_id IN 
+       (SELECT 
+          p.id 
+        FROM 
+          produits p 
+        WHERE 
+          p.categorie = 'Informatique'));
+--- SQL validée ---
+SELECT 
+  c.nom 
+FROM 
+  clients c 
+WHERE 
+  EXISTS 
+  (SELECT 
+     1 
+   FROM 
+     commandes cm 
+   WHERE 
+     cm.client_id = c.id 
+     AND cm.date_commande BETWEEN '2024-01-01' AND '2024-12-31' 
+     AND cm.produit_id IN 
+       (SELECT 
+          p.id 
+        FROM 
+          produits p 
+        WHERE 
+          p.categorie = 'Informatique'));
+Temps (s) : 2.25
+
+--- Question 137 ---
+Question : Quel est le nombre total de commandes pour chaque fournisseur par trimestre ?
+--- SQL brute ---
+SELECT fournisseurs.nom, EXTRACT(QUARTER FROM commandes.date_commande) AS trimestre, COUNT(*) AS nombre_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom, trimestre;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, EXTRACT(QUARTER FROM commandes.date_commande) AS trimestre, COUNT(*) AS nombre_commandes FROM commandes JOIN fournisseurs ON commandes.produit_id = (SELECT produit_id FROM produits WHERE produits.id = fournisseurs.id) GROUP BY fournisseurs.nom, trimestre;
+--- SQL validée ---
+SELECT fournisseurs.nom, EXTRACT(QUARTER FROM commandes.date_commande) AS trimestre, COUNT(*) AS nombre_commandes FROM commandes JOIN fournisseurs ON commandes.produit_id = (SELECT produit_id FROM produits WHERE produits.id = fournisseurs.id) GROUP BY fournisseurs.nom, trimestre
+Temps (s) : 3.06
+
+--- Question 138 ---
+Question : Quel est le client ayant commandé le plus de produits différents en 2023 ?
+--- SQL brute ---
+SELECT clients.nom, COUNT(DISTINCT commandes.produit_id) as nombre_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom ORDER BY nombre_commandes DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT
+--- SQL validée ---
+SELECT client_id FROM commandes WHERE date_commande LIKE "%2023%" GROUP BY client_id ORDER BY COUNT(DISTINCT produit_id) DESC LIMIT 1
+Temps (s) : 2.51
+
+--- Question 139 ---
+Question : Combien de commandes ont été annulées par mois ?
+--- SQL brute ---
+SELECT DATE_PART('month', c.date_commande) as mois, COUNT(c.id) as commandes_annulées FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE c.date_commande < DATE_TRUNC('year', c.date_commande) GROUP BY DATE_PART('month', c.date_commande);
+--- SQL corrigée ---
+SELECT 
+  EXTRACT(MONTH FROM c.date_commande) AS mois, 
+  COUNT(*) AS commandes_annulées 
+FROM 
+  commandes c 
+WHERE 
+  c.date_commande < DATE_TRUNC('year', c.date_commande) 
+GROUP BY 
+  EXTRACT(MONTH FROM c.date_commande) 
+ORDER BY 
+  EXTRACT(MONTH FROM c.date_commande);
+--- SQL validée ---
+SELECT 
+  EXTRACT(MONTH FROM c.date_commande) AS mois, 
+  COUNT(*) AS commandes_annulées 
+FROM 
+  commandes c 
+WHERE 
+  c.date_commande < DATE_TRUNC('year', c.date_commande) 
+GROUP BY 
+  EXTRACT(MONTH FROM c.date_commande)
+Temps (s) : 1.3
+
+--- Question 140 ---
+Question : Quel est le montant total des ventes pour chaque jour de la semaine ?
+--- SQL brute ---
+SELECT DATE_FORMAT(date_commande, '%W') as jour, SUM(montant) as total_ventes FROM commandes INNER JOIN clients ON commandes.client_id = clients.id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY jour;
+--- SQL corrigée ---
+SELECT 
+  DATE_FORMAT(date_commande, '%w') as jour, 
+  SUM(montant) as total_ventes 
+FROM 
+  commandes 
+GROUP BY 
+  DATE_FORMAT(date_commande, '%w');
+--- SQL validée ---
+SELECT 
+  DATE_FORMAT(date_commande, '%w') AS jour, 
+  SUM(montant) AS total_ventes
+Temps (s) : 1.78
+
+--- Question 141 ---
+Question : Quel est le fournisseur ayant généré le plus grand chiffre d'affaires chaque trimestre ?
+--- SQL brute ---
+SELECT f.nom as fournisseur, p.categorie as categorie_produit, t.trimestre, SUM(c.montant) as chiffre_affaire FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id JOIN fournisseurs f ON p.fournisseur_id = f.id JOIN (SELECT EXTRACT(QUARTER FROM date_commande) as trimestre, produit_id FROM commandes GROUP BY trimestre, produit_id) t ON c.date_commande = t.date_commande AND c.produit_id = t.produit_id GROUP BY f.nom, p.categorie, t.trimestre ORDER BY chiffre_affaire DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT fournisseur.nom, SUM(montant) as chiffre_affaire FROM fournisseurs fournisseur LEFT JOIN produits produit ON fournisseur.id = produit.fournisseur_id LEFT JOIN commandes commande ON produit.id = commande.produit_id GROUP BY fournisseur.nom ORDER BY chiffre_affaire DESC LIMIT 1;
+--- SQL validée ---
+SELECT fournisseur.nom, SUM(montant) as chiffre_affaire FROM fournisseurs fournisseur LEFT JOIN produits produit ON fournisseur.id = produit.fournisseur_id LEFT JOIN commandes commande ON produit.id = commande.produit_id GROUP BY fournisseur.nom ORDER BY chiffre_affaire DESC LIMIT 1
+Temps (s) : 3.07
+
+--- Question 142 ---
+Question : Combien de produits de la catégorie 'Santé' ont été commandés par les clients du secteur 'Santé' ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE p.categorie = 'Santé';
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE p.categorie = 'Santé';
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE c.secteur = 'Santé'
+Temps (s) : 3.06
+
+--- Question 143 ---
+Question : Quel est le client ayant commandé le plus souvent le lundi ?
+--- SQL brute ---
+SELECT clients.nom FROM clients JOIN commandes ON clients.id = commandes.client_id JOIN produits ON commandes.produit_id = produits.id WHERE produits.nom = 'lundi' GROUP BY clients.nom ORDER BY COUNT(*) DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT 
+FROM 
+WHERE 
+GROUP BY 
+ORDER BY 
+LIMIT 1;
+--- SQL validée ---
+SELECT 
+FROM commandes 
+WHERE date_commande LIKE "lun" 
+GROUP BY 
+client_id 
+ORDER BY 
+montant DESC 
+LIMIT 1
+Temps (s) : 3.06
+
+--- Question 144 ---
+Question : Quel est le montant total des ventes pour chaque ville chaque trimestre ?
+--- SQL brute ---
+SELECT c.ville, DATE_TRUNC('quarter', c.date_commande) AS trimestre, SUM(c.montant) AS total_ventes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.ville, trimestre;
+--- SQL corrigée ---
+SELECT 
+  c.ville, 
+  DATE_TRUNC('quarter', c.date_commande) AS trimestre, 
+  SUM(c.montant) AS total_ventes 
+FROM 
+  commandes c 
+GROUP BY 
+  c.ville, 
+  DATE_TRUNC('quarter', c.date_commande) 
+ORDER BY 
+  c.ville, 
+  trimestre;
+--- SQL validée ---
+SELECT 
+  c.ville, 
+  DATE_TRUNC('quarter', c.date_commande) AS trimestre, 
+  SUM(c.montant) AS total_ventes 
+FROM 
+  commandes c 
+GROUP BY 
+  c.ville, 
+  DATE_TRUNC('quarter', c.date_commande)
+Temps (s) : 1.02
+
+--- Question 145 ---
+Question : Quel est le produit le plus commandé par les clients du secteur 'Education' ?
+--- SQL brute ---
+SELECT produits.nom FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id WHERE clients.secteur = 'Education' GROUP BY produits.nom ORDER BY COUNT(*) DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT produits.nom 
+FROM produits 
+WHERE produits.id IN (
+  SELECT produit_id 
+  FROM commandes 
+  JOIN clients ON commandes.client_id = clients.id 
+  WHERE clients.secteur = 'Education' 
+  GROUP BY produit_id 
+  ORDER BY COUNT(*) DESC 
+  LIMIT 1
+)
+--- SQL validée ---
+SELECT produits.nom FROM produits WHERE produits.id IN (SELECT produit_id FROM commandes JOIN clients ON commandes.client_id = clients.id WHERE clients.secteur = 'Education' GROUP BY produit_id ORDER BY COUNT(*) DESC LIMIT 1
+Temps (s) : 3.06
+
+--- Question 146 ---
+Question : Combien de commandes ont été livrées en avance ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE prix_unitaire > 100;
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes c JOIN clients cl ON c.client_id = cl.id WHERE date_commande < c.date_commande;
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes c JOIN clients cl ON c.client_id = cl.id WHERE date_commande < c.date_commande
+Temps (s) : 3.06
+
+--- Question 147 ---
+Question : Liste les commandes dont le montant est supérieur à la moyenne des montants de l'année.
+--- SQL brute ---
+SELECT c.id, c.date_commande, c.montant FROM commandes c INNER JOIN clients cl ON c.client_id = cl.id INNER JOIN produits p ON c.produit_id = p.id WHERE c.montant > (SELECT AVG(montant) FROM commandes);
+--- SQL corrigée ---
+SELECT c.id, c.date_commande, c.montant 
+FROM commandes c 
+WHERE c.montant > (SELECT AVG(c2.montant) FROM commandes c2);
+--- SQL validée ---
+SELECT c.id, c.date_commande, c.montant 
+FROM commandes c 
+WHERE c.montant > (SELECT AVG(montant) FROM commandes)
+Temps (s) : 0.57
+
+--- Question 148 ---
+Question : Quel est le nombre total de commandes par fournisseur et par ville ?
+--- SQL brute ---
+SELECT clients.ville, fournisseurs.nom, COUNT(commandes.id) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY clients.ville, fournisseurs.nom;
+--- SQL corrigée ---
+SELECT clients.ville, fournisseurs.nom, COUNT(commandes.id) 
+FROM clients 
+JOIN commandes ON clients.id = commandes.client_id 
+JOIN fournisseurs ON commandes.produit_id = fournisseurs.id 
+GROUP BY clients.ville, fournisseurs.nom;
+--- SQL validée ---
+SELECT clients.ville, fournisseurs.nom, COUNT(commandes.id) 
+FROM clients 
+JOIN commandes ON clients.id = commandes.client_id 
+JOIN fournisseurs ON commandes.produit_id = fournisseurs.id 
+GROUP BY clients.ville, fournisseurs.nom
+Temps (s) : 3.06
+
+--- Question 149 ---
+Question : Quel est le montant total des commandes passées en ligne ?
+--- SQL brute ---
+SELECT SUM(c.montant) AS total_commandes FROM commandes c;
+--- SQL corrigée ---
+SELECT SUM(m.montant) AS total_commandes FROM commandes c
+JOIN produits m ON c.produit_id = m.id;
+--- SQL validée ---
+SELECT SUM(m.montant) AS total_commandes FROM commandes c
+JOIN produits m ON c.produit_id = m.id
+Temps (s) : 1.73
+
+--- Question 150 ---
+Question : Quel est le client ayant le montant moyen de commande le plus élevé ?
+--- SQL brute ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id ORDER BY AVG(commandes.montant) DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT nom FROM clients WHERE id = (SELECT client_id FROM commandes GROUP BY client_id ORDER BY SUM(montant) DESC LIMIT 1);
+--- SQL validée ---
+SELECT nom FROM clients WHERE id = (SELECT client_id FROM commandes GROUP BY client_id ORDER BY SUM(montant) DESC LIMIT 1)
+Temps (s) : 0.45
+
+--- Question 151 ---
+Question : Combien de fournisseurs différents ont vendu des produits de la catégorie 'Informatique' ?
+--- SQL brute ---
+SELECT COUNT(DISTINCT clients.id) AS fournisseurs_différents FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id WHERE produits.categorie = 'Informatique';
+--- SQL corrigée ---
+SELECT COUNT(DISTINCT fournisseurs.id) AS fournisseurs_différents
+FROM fournisseurs
+JOIN produits ON fournisseurs.id = produits.id
+WHERE produits.categorie = 'Informatique';
+--- SQL validée ---
+SELECT COUNT(DISTINCT fournisseurs.id) AS fournisseurs_différents
+Temps (s) : 2.51
+
+--- Question 152 ---
+Question : Quel est le produit ayant été commandé le moins de fois en 2024 ?
+--- SQL brute ---
+SELECT produits.nom FROM produits JOIN commandes ON produits.id = commandes.produit_id JOIN clients ON commandes.client_id = clients.id JOIN fournisseurs ON produits.id = fournisseurs.id WHERE commandes.date_commande BETWEEN '2024-01-01' AND '2024-12-31' GROUP BY produits.nom ORDER BY COUNT(*) ASC LIMIT 1;
+--- SQL corrigée ---
+SELECT produits.nom FROM produits LEFT JOIN commandes ON produits.id = commandes.produit_id WHERE commandes.date_commande BETWEEN '2024-01-01' AND '2024-12-31' GROUP BY produits.nom ORDER BY COUNT(*) ASC LIMIT 1;
+--- SQL validée ---
+SELECT produits.nom FROM produits LEFT JOIN commandes ON produits.id = commandes.produit_id WHERE commandes.date_commande BETWEEN '2024-01-01' AND '2024-12-31' GROUP BY produits.nom ORDER BY COUNT(*) LIMIT 1;
+Temps (s) : 3.09
+
+--- Question 153 ---
+Question : Donne la liste des produits qui n'ont jamais été commandés au mois de décembre.
+--- SQL brute ---
+SELECT produits.nom FROM produits LEFT JOIN commandes ON produits.id = commandes.produit_id WHERE commandes.date_commande IS NULL OR commandes.date_commande > '2022-12-31' GROUP BY produits.nom HAVING COUNT(produits.id) = 0;
+--- SQL corrigée ---
+SELECT produits.nom FROM produits WHERE produits.id NOT IN (SELECT produit_id FROM commandes WHERE date_commande LIKE '%12-01%');
+--- SQL validée ---
+SELECT produits.nom FROM produits WHERE NOT produits.id IN (SELECT produit_id FROM commandes WHERE date_commande LIKE '%12-01%');
+Temps (s) : 3.06
+
+--- Question 154 ---
+Question : Quel est le chiffre d'affaires total par client pour les commandes de plus de 2000 euros ?
+--- SQL brute ---
+SELECT c.id AS client_id, SUM(c.montant) AS total_achat_par_client FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.client_id HAVING total_achat_par_client > 2000;
+--- SQL corrigée ---
+SELECT c.id AS client_id, SUM(c.montant) AS total_achat_par_client
+FROM commandes c
+GROUP BY c.client_id
+HAVING SUM(c.montant) > 2000;
+--- SQL validée ---
+SELECT c.id AS client_id, SUM(c.montant) AS total_achat_par_client
+FROM commandes c
+GROUP BY c.client_id
+Temps (s) : 0.7
+
+--- Question 155 ---
+Question : Quel est le montant total des commandes dont la livraison a été annulée ?
+--- SQL brute ---
+SELECT SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.secteur = 'informatique';
+--- SQL corrigée ---
+SELECT SUM(c.montant) FROM commandes c WHERE c.date_livraison IS NULL;
+--- SQL validée ---
+SELECT SUM(c.montant) FROM commandes c WHERE c.date_livraison IS NULL
+Temps (s) : 3.05
+
+--- Question 156 ---
+Question : Quel est le fournisseur ayant vendu des produits à tous les clients ?
+--- SQL brute ---
+SELECT fournisseurs.nom FROM fournisseurs JOIN produits ON fournisseurs.id = produits.fournisseur_id JOIN commandes ON produits.id = commandes.produit_id GROUP BY fournisseurs.nom HAVING COUNT(DISTINCT commandes.id) = (SELECT COUNT(*) FROM commandes);
+--- SQL corrigée ---
+SELECT fournisseurs.nom 
+FROM fournisseurs 
+WHERE fournisseurs.id IN (SELECT fournisseur_id FROM produits WHERE id IN (SELECT produit_id FROM commandes));
+--- SQL validée ---
+SELECT fournisseurs.nom
+FROM fournisseurs 
+WHERE fournisseurs.id IN (SELECT fournisseur_id FROM produits)
+Temps (s) : 0.51
+
+--- Question 157 ---
+Question : Liste les clients qui ont passé des commandes chaque année depuis 2020.
+--- SQL brute ---
+SELECT c.client_id, COUNT(DISTINCT YEAR(c.date_commande)) as année, COUNT(c.id) as nombre_commandes FROM commandes c JOIN clients cl ON c.client_id = cl.id GROUP BY c.client_id HAVING COUNT(DISTINCT YEAR(c.date_commande)) > 2020;
+--- SQL corrigée ---
+SELECT c.client_id, COUNT(DISTINCT YEAR(c.date_commande)) as année, COUNT(*) as nombre_commandes
+FROM commandes c
+JOIN clients cl ON c.client_id = cl.id
+WHERE c.date_commande >= '2020-01-01'
+GROUP BY c.client_id
+HAVING COUNT(DISTINCT YEAR(c.date_commande)) > 0;
+--- SQL validée ---
+SELECT c.client_id, COUNT(DISTINCT YEAR(c.date_commande)) AS annee, COUNT(*) AS nombre_commandes
+FROM commandes c
+JOIN clients cl ON c.client_id = cl.id
+WHERE c.date_commande >= '2020-01-01'
+Temps (s) : 1.25
+
+--- Question 158 ---
+Question : Combien de commandes ont été passées lors du Black Friday ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE c.date_commande BETWEEN '2021-01-11' AND '2021-01-17';
+--- SQL corrigée ---
+SELECT
+  COUNT(*)
+FROM
+  commandes
+WHERE
+  date_commande BETWEEN '2021-11-26' AND '2021-11-27';
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande BETWEEN "2021-11-26" AND "2021-11-27"
+Temps (s) : 0.69
+
+--- Question 159 ---
+Question : Quel est le nombre de clients par fournisseur ?
+--- SQL brute ---
+SELECT fournisseurs.nom AS fournisseur, COUNT(DISTINCT clients.id) AS nombre_clients FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseur;
+--- SQL corrigée ---
+SELECT fournisseurs.nom AS fournisseur, COUNT(DISTINCT clients.id) AS nombre_clients FROM fournisseurs JOIN produits ON fournisseurs.id = produits.id_fournisseur JOIN commandes ON commandes.produit_id = produits.id JOIN clients ON commandes.client_id = clients.id GROUP BY fournisseurs.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom AS fournisseur, COUNT(DISTINCT clients.id) AS nombre_clients FROM fournisseurs JOIN produits ON fournisseurs.id = produits.id_fournisseur JOIN commandes ON commandes.produit_id = produits.id JOIN clients ON commandes.client_id = clients.id GROUP BY fournisseurs.nom
+Temps (s) : 3.06
+
+--- Question 160 ---
+Question : Quel est le montant total des ventes réalisées en ligne par fournisseur ?
+--- SQL brute ---
+SELECT fournisseurs.nom, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) AS total_ventes
+FROM commandes
+JOIN clients ON commandes.client_id = clients.id
+JOIN produits ON commandes.produit_id = produits.id
+JOIN fournisseurs ON produits.id = fournisseurs.id
+GROUP BY fournisseurs.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) AS total_ventes
+FROM commandes
+JOIN clients ON commandes.client_id = clients.id
+JOIN produits ON commandes.produit_id = produits.id
+JOIN fournisseurs ON produits.id = fournisseurs.id
+Temps (s) : 2.3
+
+--- Question 161 ---
+Question : Quel est le nombre de commandes passées pour chaque combinaison client/produit ?
+--- SQL brute ---
+SELECT clients.id AS client_id, produits.id AS produit_id, COUNT(*) AS nombre_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id, produits.id;
+--- SQL corrigée ---
+SELECT clients.id AS client_id, produits.id AS produit_id, COUNT(*) AS nombre_commandes
+FROM commandes
+JOIN clients ON commandes.client_id = clients.id
+JOIN produits ON commandes.produit_id = produits.id
+GROUP BY clients.id, produits.id;
+--- SQL validée ---
+SELECT clients.id AS client_id, produits.id AS produit_id, COUNT(*) AS nombre_commandes
+FROM commandes
+JOIN clients ON commandes.client_id = clients.id
+JOIN produits ON commandes.produit_id = produits.id
+Temps (s) : 2.41
+
+--- Question 162 ---
+Question : Quel est le fournisseur ayant vendu le plus grand nombre de produits différents chaque mois ?
+--- SQL brute ---
+SELECT fournisseurs.nom, SUM(commandes.montant) AS total_achat FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom ORDER BY total_achat DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, COUNT(DISTINCT commandes.produit_id) AS distinct_products_sold FROM fournisseurs 
+JOIN produits ON fournisseurs.id = produits.id 
+JOIN commandes ON produits.id = commandes.produit_id 
+GROUP BY fournisseurs.nom 
+ORDER BY distinct_products_sold DESC 
+LIMIT 1;
+--- SQL validée ---
+SELECT fournisseurs.nom, COUNT(DISTINCT commandes.produit_id) AS different_products_sold FROM fournisseurs 
+JOIN produits ON fournisseurs.id = produits.id 
+JOIN commandes ON produits.id = commandes.produit_id 
+GROUP BY fournisseurs.nom 
+ORDER BY different_products_sold DESC 
+LIMIT 1
+Temps (s) : 1.1
+
+--- Question 163 ---
+Question : Quel est le client ayant commandé chaque mois depuis 2022 ?
+--- SQL brute ---
+SELECT clients.nom, DATE_TRUNC('month', commandes.date_commande) AS mois, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY mois, clients.nom;
+--- SQL corrigée ---
+SELECT clients.nom, 
+       DATE_TRUNC('month', commandes.date_commande) AS mois, 
+       COUNT(*) AS nb_commandes
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id
+WHERE EXTRACT(YEAR FROM commandes.date_commande) = 2022
+GROUP BY mois, clients.nom;
+--- SQL validée ---
+SELECT clients.nom, 
+       DATE_TRUNC('month', commandes.date_commande) AS mois, 
+       COUNT(*) AS nb_commandes
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id
+WHERE EXTRACT(YEAR FROM commandes.date_commande) = 2022
+GROUP BY mois, clients.nom
+Temps (s) : 1.66
+
+--- Question 164 ---
+Question : Combien de commandes ont été payées en espèces chaque année ?
+--- SQL brute ---
+SELECT YEAR(date_commande) as annee, COUNT(*) as nombre_commandes FROM commandes GROUP BY annee;
+--- SQL corrigée ---
+SELECT 
+  EXTRACT(YEAR FROM c.date_commande) AS annee, 
+  COUNT(*) AS nombre_commandes 
+FROM 
+  commandes c 
+WHERE 
+  c.montant < 0 
+GROUP BY 
+  EXTRACT(YEAR FROM c.date_commande);
+--- SQL validée ---
+SELECT 
+  EXTRACT(YEAR FROM c.date_commande) AS annee, 
+  COUNT(*) AS nombre_commandes 
+FROM 
+  commandes c 
+WHERE 
+  c.montant < 0 
+GROUP BY 
+  EXTRACT(YEAR FROM c.date_commande)
+Temps (s) : 1.07
+
+--- Question 165 ---
+Question : Quel est le montant moyen des commandes pour chaque jour de la semaine ?
+--- SQL brute ---
+SELECT fournisseurs.nom, DATE_FORMAT(commandes.date_commande, '%W') as jour_semence, AVG(commandes.montant) as moyen_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom, jour_semence;
+--- SQL corrigée ---
+SELECT  -- Your SQL query here
+______________________________________________________
+--- SQL validée ---
+SELECT
+Temps (s) : 0.44
+
+--- Question 166 ---
+Question : Liste les clients ayant passé des commandes chaque mois et chaque année.
+--- SQL brute ---
+SELECT clients.nom, EXTRACT(MONTH FROM commandes.date_commande) as mois, EXTRACT(YEAR FROM commandes.date_commande) as annee, COUNT(DISTINCT commandes.id) as nombre_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom, mois, annee;
+--- SQL corrigée ---
+SELECT clients.nom, 
+       EXTRACT(MONTH FROM commandes.date_commande) as mois, 
+       EXTRACT(YEAR FROM commandes.date_commande) as annee, 
+       COUNT(DISTINCT commandes.id) as nombre_commandes 
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id 
+GROUP BY clients.nom, EXTRACT(MONTH FROM commandes.date_commande), EXTRACT(YEAR FROM commandes.date_commande);
+--- SQL validée ---
+SELECT clients.nom, 
+       EXTRACT(MONTH FROM commandes.date_commande) AS mois, 
+       EXTRACT(YEAR FROM commandes.date_commande) AS annee, 
+       COUNT(DISTINCT commandes.id) AS nombre_commandes 
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id 
+GROUP BY clients.nom, EXTRACT(MONTH FROM commandes.date_commande), EXTRACT(YEAR FROM commandes.date_commande)
+Temps (s) : 3.06
+
+--- Question 167 ---
+Question : Quel est le produit le plus vendu par ville ?
+--- SQL brute ---
+SELECT p.nom, SUM(c.montant) as total_ventes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom ORDER BY total_ventes DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT ville, SUM(montant) as total_ventes FROM clients c 
+JOIN commandes cm ON c.id = cm.client_id 
+GROUP BY ville 
+ORDER BY total_ventes DESC 
+LIMIT 1;
+--- SQL validée ---
+SELECT ville, SUM(montant) AS total_ventes FROM commandes cm 
+JOIN clients c ON cm.client_id = c.id GROUP BY ville ORDER BY total_ventes DESC LIMIT 1
+Temps (s) : 1.72
+
+--- Question 168 ---
+Question : Quel est le montant total des commandes payées en espèces et en ligne ?
+--- SQL brute ---
+SELECT SUM(commandes.montant) FROM commandes INNER JOIN clients ON commandes.client_id = clients.id INNER JOIN produits ON commandes.produit_id = produits.id;
+--- SQL corrigée ---
+SELECT SUM(commandes.montant) AS total_montant 
+FROM commandes 
+WHERE commandes.montant IN (SELECT SUM(commandes.montant) FROM commandes WHERE commandes.paiement = 'en espèces' OR commandes.paiement = 'en ligne') ;
+--- SQL validée ---
+SELECT SUM(commandes.montant) AS total_montant 
+FROM commandes 
+WHERE commandes.paiement = 'en espèces' OR commandes.paiement = 'en ligne'
+Temps (s) : 3.05
+
+--- Question 169 ---
+Question : Quel est le client ayant commandé tous les produits en 2024 ?
+--- SQL brute ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE YEAR(commandes.date_commande) = 2024 GROUP BY clients.nom HAVING COUNT(DISTINCT produits.id) = (SELECT COUNT(*) FROM produits);
+--- SQL corrigée ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE YEAR(commandes.date_commande) = 2024 GROUP BY clients.nom HAVING COUNT(DISTINCT produits.id) = (SELECT COUNT(*) FROM produits);
+--- SQL validée ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE YEAR(commandes.date_commande) = 2024 GROUP BY clients.nom HAVING COUNT(DISTINCT produits.id) = (SELECT COUNT(*) FROM produits
+Temps (s) : 2.43
+
+--- Question 170 ---
+Question : Quel est le montant total des ventes réalisées pour chaque fournisseur par catégorie de produit ?
+--- SQL brute ---
+SELECT clients.secteur, fournisseurs.nom AS fournisseur, SUM(commandes.montant) AS total_ventes FROM clients JOIN commandes ON clients.id = commandes.client_id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY clients.secteur, fournisseurs.nom;
+--- SQL corrigée ---
+SELECT 
+    fournisseurs.categorie_fournisseur, 
+    fournisseurs.nom AS fournisseur, 
+    SUM(commandes.montant) AS total_ventes 
+FROM 
+    commandes 
+JOIN 
+    produits ON commandes.produit_id = produits.id 
+JOIN 
+    fournisseurs ON produits.id = fournisseurs.id 
+GROUP BY 
+    fournisseurs.categorie_fournisseur, 
+    fournisseurs.nom;
+--- SQL validée ---
+SELECT 
+    fournisseurs.categorie_fournisseur, 
+    fournisseurs.nom AS fournisseur, 
+    SUM(commandes.montant) AS total_ventes 
+FROM 
+    commandes 
+JOIN 
+    produits ON commandes.produit_id = produits.id 
+JOIN 
+    fournisseurs ON produits.id = fournisseurs.id 
+GROUP BY 
+    fournisseurs.categorie_fournisseur, 
+    fournisseurs.nom
+Temps (s) : 1.63
+
+--- Question 171 ---
+Question : Quel est le produit qui n’a jamais été vendu à un client de la ville de Paris ?
+--- SQL brute ---
+SELECT id, nom FROM produits WHERE id NOT IN (SELECT produit_id FROM commandes JOIN clients ON commandes.client_id = clients.id WHERE clients.ville = 'Paris' EXCEPT SELECT produit_id, prix_unitaire FROM commandes JOIN produits ON commandes.produit_id = produits.id WHERE clients.ville = 'Paris');
+--- SQL corrigée ---
+SELECT * FROM produits WHERE id NOT IN (SELECT produit_id FROM commandes JOIN clients ON commandes.client_id = clients.id WHERE clients.ville = 'Paris') OR produits.prix_unitaire IS NULL;
+--- SQL validée ---
+SELECT * FROM produits WHERE id NOT IN (SELECT produit_id FROM commandes JOIN clients ON commandes.client_id = clients.id WHERE clients.ville = 'Paris') OR produits.prix_unitaire IS NULL
+Temps (s) : 0.63
+
+--- Question 172 ---
+Question : Combien de commandes ont été passées par les clients du secteur 'Public' ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.secteur = 'Public';
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes c WHERE c.client_id IN (SELECT id FROM clients WHERE secteur = 'Public');
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes c WHERE c.client_id IN (SELECT id FROM clients WHERE secteur = 'Public')
+Temps (s) : 3.05
+
+--- Question 173 ---
+Question : Liste les commandes passées un jour férié.
+--- SQL brute ---
+SELECT commandes.id, commandes.date_commande, commandes.montant, clients.id, clients.nom, clients.secteur, clients.ville, produits.id, produits.nom, produits.categorie, produits.prix_unitaire FROM commandes INNER JOIN clients ON commandes.client_id = clients.id INNER JOIN produits ON commandes.produit_id = produits.id;
+--- SQL corrigée ---
+SELECT * FROM commandes WHERE date_commande IN (
+  SELECT date_commande FROM commandes WHERE date_commande IN (
+    SELECT date_commande FROM commandes GROUP BY date_commande HAVING COUNT(*) >= 3
+  )
+);
+--- SQL validée ---
+SELECT * FROM commandes WHERE date_commande IN (
+  SELECT date_commande FROM commandes WHERE date_commande IN (
+    SELECT date_commande FROM commandes GROUP BY date_commande HAVING COUNT(*) >= 3
+  )
+)
+Temps (s) : 1.94
+
+--- Question 174 ---
+Question : Quel est le nombre de clients ayant commandé chaque catégorie de produit ?
+--- SQL brute ---
+SELECT p.categorie, COUNT(DISTINCT c.client_id) FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie;
+--- SQL corrigée ---
+SELECT p.categorie, COUNT(c.client_id) FROM produits p LEFT JOIN commandes c ON p.id = c.produit_id GROUP BY p.categorie;
+--- SQL validée ---
+SELECT p.categorie, COUNT(c.client_id) FROM produits p LEFT JOIN commandes c ON p.id = c.produit_id GROUP BY p.categorie
+Temps (s) : 0.82
+
+--- Question 175 ---
+Question : Quel est le fournisseur ayant généré le plus de chiffre d'affaires en 2023 ?
+--- SQL brute ---
+SELECT fournisseurs.nom, SUM(commandes.montant) AS total_domicilieux FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.fournisseur_id = fournisseurs.id GROUP BY fournisseurs.nom ORDER BY total_domicilieux DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) AS total_domicilieux FROM fournisseurs
+JOIN produits ON fournisseurs.id = produits.fournisseur_id
+JOIN commandes ON produits.id = commandes.produit_id
+WHERE YEAR(commandes.date_commande) = 2023
+GROUP BY fournisseurs.nom
+ORDER BY SUM(commandes.montant) DESC
+LIMIT 1;
+--- SQL validée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) AS total_domicilieux FROM fournisseurs
+JOIN produits ON fournisseurs.id = produits.fournisseur_id
+JOIN commandes ON produits.id = commandes.produit_id
+WHERE YEAR(commandes.date_commande) = 2023
+GROUP BY fournisseurs.nom
+ORDER BY SUM(commandes.montant) DESC
+Temps (s) : 1.34
+
+--- Question 176 ---
+Question : Quel est le produit le plus commandé par les clients du secteur 'BTP' ?
+--- SQL brute ---
+SELECT p.nom AS produit_le_plus_commandé, c.date_commande, c.montant FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE c.client_id IN (SELECT id FROM clients WHERE secteur = 'BTP') GROUP BY p.nom ORDER BY SUM(c.montant) DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT p.nom AS produit_le_plus_commandé, SUM(c.montant) AS total_commande FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE c.client_id IN (SELECT id FROM clients WHERE secteur = 'BTP') GROUP BY p.nom ORDER BY total_commande DESC LIMIT 1;
+--- SQL validée ---
+SELECT p.nom AS produit_le_plus_commandé, SUM(c.montant) AS total_commande FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE c.client_id IN (SELECT id FROM clients WHERE secteur = 'BTP') GROUP BY p.nom ORDER BY total_commande DESC LIMIT 1
+Temps (s) : 1.38
+
+--- Question 177 ---
+Question : Donne la liste des produits vendus exclusivement par un seul fournisseur.
+--- SQL brute ---
+SELECT p.nom FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.id = (SELECT client_id FROM commandes WHERE montant = (SELECT MAX(montant) FROM commandes));
+--- SQL corrigée ---
+SELECT p.nom 
+FROM commandes c JOIN clients cl ON c.client_id = cl.id 
+JOIN produits p ON c.produit_id = p.id 
+WHERE cl.id = (SELECT client_id FROM commandes WHERE montant = (SELECT MAX(montant) FROM commandes));
+--- SQL validée ---
+SELECT p.nom FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.id = (SELECT client_id FROM commandes WHERE montant = (SELECT MAX(montant) FROM commandes)
+Temps (s) : 3.06
+
+--- Question 178 ---
+Question : Quel est le montant total des commandes pour chaque ville, chaque mois et chaque année ?
+--- SQL brute ---
+SELECT c.date_commande, c.ville, DATE_TRUNC('month', c.date_commande) as mois, DATE_TRUNC('year', c.date_commande) as annee, SUM(c.montant) as total_commandes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.date_commande, c.ville, mois, annee;
+--- SQL corrigée ---
+SELECT 
+  DATE_TRUNC('month', c.date_commande) AS mois, 
+  DATE_TRUNC('year', c.date_commande) AS annee, 
+  c.ville, 
+  SUM(c.montant) AS total_commandes 
+FROM 
+  commandes c 
+JOIN 
+  clients cl ON c.client_id = cl.id 
+GROUP BY 
+  mois, annee, c.ville;
+--- SQL validée ---
+SELECT 
+  DATE_TRUNC('month', c.date_commande) AS mois, 
+  DATE_TRUNC('year', c.date_commande) AS annee, 
+  c.ville, 
+  SUM(c.montant) AS total_commandes
+Temps (s) : 3.06
+
+--- Question 179 ---
+Question : Quel est le client ayant commandé le plus de produits chaque année ?
+--- SQL brute ---
+SELECT clients.id, clients.nom, COUNT(DISTINCT commandes.id) as nombre_commandes FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id ORDER BY nombre_commandes DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT  -- YOUR CORRECTED SQL QUERY HERE --
+--- SQL validée ---
+SELECT t1.id, t1.nom FROM clients AS t1 JOIN commandes AS t2 ON t1.id = t2.client_id GROUP BY t1.id ORDER BY SUM(t2.montant) DESC LIMIT 1
+Temps (s) : 3.05
+
+--- Question 180 ---
+Question : Quel est le montant total des commandes dont le fournisseur est à l'étranger ?
+--- SQL brute ---
+SELECT SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE cl.ville != p.ville;
+--- SQL corrigée ---
+SELECT
+  SUM(c.montant)
+FROM
+  commandes c
+  JOIN fournisseurs f ON c.client_id IN (
+    SELECT id FROM clients WHERE ville != f.pays
+  )
+WHERE
+  f.pays != 'France';
+--- SQL validée ---
+SELECT SUM(c.montant) FROM commandes c JOIN fournisseurs f ON c.client_id IN (SELECT id FROM clients WHERE ville != f.pays) WHERE f.pays != "France"
+Temps (s) : 1.85
+
+--- Question 181 ---
+Question : Combien de produits différents ont été commandés chaque trimestre ?
+--- SQL brute ---
+SELECT DATE_PART('quarter', date_commande) AS trimestre, COUNT(DISTINCT produits.id) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY trimestre;
+--- SQL corrigée ---
+SELECT DATE_PART('quarter', date_commande) AS trimestre, COUNT(DISTINCT produits.id) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY trimestre;
+--- SQL validée ---
+SELECT DATE_PART('quarter', date_commande) AS trimestre, COUNT(DISTINCT produits.id) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY trimestre
+Temps (s) : 0.18
+
+--- Question 182 ---
+Question : Quel est le chiffre d'affaires total par secteur et par trimestre ?
+--- SQL brute ---
+SELECT fournisseurs.categorie_fournisseur, clients.secteur, DATE_TRUNC('quarter', commandes.date_commande) AS trimestre, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.categorie_fournisseur, clients.secteur, trimestre;
+--- SQL corrigée ---
+SELECT fournisseurs.categorie_fournisseur, clients.secteur, DATE_TRUNC('quarter', commandes.date_commande) AS trimestre, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.categorie_fournisseur, clients.secteur, trimestre;
+--- SQL validée ---
+SELECT fournisseurs.categorie_fournisseur, clients.secteur, DATE_TRUNC('quarter', commandes.date_commande) AS trimestre, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.categorie_fournisseur, clients.secteur, trimestre
+Temps (s) : 0.19
+
+--- Question 183 ---
+Question : Quel est le nombre de commandes passées en décembre 2023 ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes WHERE date_commande BETWEEN '2023-12-01' AND '2023-12-31';
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande BETWEEN '2023-12-01' AND '2023-12-31';
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande BETWEEN "2023-12-01" AND "2023-12-31"
+Temps (s) : 3.05
+
+--- Question 184 ---
+Question : Quel est le client ayant commandé le plus de produits de la catégorie 'Bureautique' ?
+--- SQL brute ---
+SELECT clients.nom, COUNT(DISTINCT commandes.id) AS nombre_de_commandes FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE produits.categorie = 'Bureautique' GROUP BY clients.id ORDER BY nombre_de_commandes DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT_____________________;
+--- SQL validée ---
+SELECT T1.nom FROM clients AS T1 JOIN commandes AS T2 ON T1.id = T2.client_id JOIN produits AS T3 ON T2.produit_id = T3.id WHERE T3.categorie = "Office Automation"
+Temps (s) : 3.07
+
+--- Question 185 ---
+Question : Combien de produits de chaque catégorie ont été vendus chaque année ?
+--- SQL brute ---
+SELECT p.categorie, YEAR(c.date_commande) as year, COUNT(c.id) as nb_commandes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie, year;
+--- SQL corrigée ---
+SELECT p.categorie, YEAR(c.date_commande) as year, COUNT(c.id) as nb_commandes 
+FROM commandes c JOIN produits p ON c.produit_id = p.id 
+GROUP BY p.categorie, YEAR(c.date_commande);
+--- SQL validée ---
+SELECT p.categorie, YEAR(c.date_commande) AS "year", COUNT(c.id) AS "nb_commandes"
+Temps (s) : 2.15
+
+--- Question 186 ---
+Question : Quel est le montant total des commandes annulées pour chaque mois ?
+--- SQL brute ---
+SELECT DATE_TRUNC('month', c.date_commande) as mois, SUM(c.montant) as total_commandes_annulees FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY mois ORDER BY mois;
+--- SQL corrigée ---
+SELECT 
+  DATE_TRUNC('month', c.date_commande) as mois, 
+  SUM(c.montant) as total_commandes_annulees 
+FROM 
+  commandes c 
+WHERE 
+  c.montant = 0 
+GROUP BY 
+  mois 
+ORDER BY 
+  mois;
+--- SQL validée ---
+SELECT 
+  DATE_TRUNC('month', c.date_commande) as mois, 
+  SUM(c.montant) as total_commandes_annulees 
+FROM 
+  commandes c 
+WHERE 
+  c.montant = 0 
+GROUP BY 
+  mois
+Temps (s) : 2.82
+
+--- Question 187 ---
+Question : Quel est le nombre moyen de commandes par client pour chaque ville ?
+--- SQL brute ---
+SELECT c.ville, AVG(c.montant) as moyenne_commandes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.ville;
+--- SQL corrigée ---
+SELECT ville, AVG(montant) as moyenne_commandes 
+FROM commandes 
+WHERE client_id IN (SELECT id FROM clients) 
+GROUP BY ville;
+--- SQL validée ---
+SELECT ville, AVG(montant) as moyenne_commandes 
+FROM commandes 
+WHERE client_id IN (SELECT id FROM clients) 
+GROUP BY ville
+Temps (s) : 3.05
+
+--- Question 188 ---
+Question : Liste les clients n'ayant jamais commandé de produits de la catégorie 'Santé'.
+--- SQL brute ---
+SELECT clients.id, clients.nom FROM clients LEFT JOIN commandes ON clients.id = commandes.client_id LEFT JOIN produits ON commandes.produit_id = produits.id LEFT JOIN fournisseurs ON produits.id = fournisseurs.id WHERE fournisseurs.id IS NULL;
+--- SQL corrigée ---
+SELECT clients.id, clients.nom
+FROM clients
+LEFT JOIN commandes ON clients.id = commandes.client_id
+WHERE clients.id NOT IN (
+  SELECT client_id 
+  FROM commandes 
+  WHERE produit_id IN (
+    SELECT id 
+    FROM produits 
+    WHERE categorie = 'Santé'
+  )
+);
+--- SQL validée ---
+SELECT clients.id, clients.nom
+FROM clients
+LEFT JOIN commandes ON clients.id = commandes.client_id
+WHERE clients.id NOT IN (
+  SELECT client_id 
+  FROM commandes 
+  WHERE produit_id IN (
+    SELECT id 
+    FROM produits 
+    WHERE categorie = 'Santé'
+  )
+Temps (s) : 3.06
+
+--- Question 189 ---
+Question : Quel est le fournisseur ayant vendu le moins de produits en 2023 ?
+--- SQL brute ---
+SELECT fournisseurs.nom FROM fournisseurs JOIN produits ON fournisseurs.id = produits.fournisseur_id JOIN commandes ON produits.id = commandes.produit_id JOIN clients ON commandes.client_id = clients.id GROUP BY fournisseurs.nom ORDER BY COUNT(DISTINCT produits.id) ASC LIMIT 1;
+--- SQL corrigée ---
+SELECT fournisseurs.nom 
+FROM fournisseurs 
+JOIN produits ON fournisseurs.id = produits.fournisseur_id 
+JOIN (
+  SELECT fournisseur_id, COUNT(*) AS nombre_commandes
+  FROM commandes
+  WHERE date_commande >= '2023-01-01' AND date_commande < '2024-01-01'
+  GROUP BY fournisseur_id
+) AS commandes_2023 
+ON produits.fournisseur_id = commandes_2023.fournisseur_id 
+ORDER BY nombre_commandes ASC 
+LIMIT 1;
+--- SQL validée ---
+SELECT fournisseurs.nom 
+FROM fournisseurs 
+JOIN produits ON fournisseurs.id = produits.fournisseur_id 
+JOIN (
+  SELECT fournisseur_id, COUNT(*) AS nombre_commandes
+  FROM commandes
+  WHERE date_commande >= '2023-01-01' AND date_commande < '2024-01-01'
+  GROUP BY fournisseur_id
+) AS commandes_2023 
+ON produits.fournisseur_id = commandes_2023.fournisseur_id 
+ORDER BY nombre_commandes LIMIT 1
+Temps (s) : 3.06
+
+--- Question 190 ---
+Question : Quel est le nombre total de commandes pour chaque secteur, chaque année et chaque ville ?
+--- SQL brute ---
+SELECT c.secteur, EXTRACT(YEAR FROM c.date_commande) AS annee, c.ville, COUNT(DISTINCT c.id) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.secteur, c.annee, c.ville;
+--- SQL corrigée ---
+SELECT c.secteur, EXTRACT(YEAR FROM c.date_commande) AS annee, c.ville, COUNT(DISTINCT c.id) 
+FROM commandes c JOIN clients cl ON c.client_id = cl.id 
+GROUP BY c.secteur, EXTRACT(YEAR FROM c.date_commande), c.ville;
+--- SQL validée ---
+SELECT c.secteur, EXTRACT(YEAR FROM c.date_commande), c.ville, COUNT(DISTINCT c.id) FROM commandes AS c JOIN clients AS cl ON c.client_id = cl.id GROUP BY c.secteur, EXTRACT(YEAR FROM c.date_commande), c.ville
+Temps (s) : 2.38
+
+--- Question 191 ---
+Question : Quel est le client ayant commandé chez le plus grand nombre de fournisseurs différents ?
+--- SQL brute ---
+SELECT clients.nom, COUNT(DISTINCT fournisseurs.id) as nombre_fournisseurs FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY clients.id ORDER BY nombre_fournisseurs DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT nom, COUNT(DISTINCT fournisseurs.id) as nombre_fournisseurs
+FROM clients
+JOIN commandes ON clients.id = commandes.client_id
+JOIN produits ON commandes.produit_id = produits.id
+JOIN fournisseurs ON produits.id = fournisseurs.id
+GROUP BY nom
+ORDER BY nombre_fournisseurs DESC
+LIMIT 1;
+--- SQL validée ---
+SELECT nom, COUNT(DISTINCT fournisseurs.id) as nombre_fournisseurs
+FROM clients
+JOIN commandes ON clients.id = commandes.client_id
+JOIN produits ON commandes.produit_id = produits.id
+JOIN fournisseurs ON produits.id = fournisseurs.id
+Temps (s) : 3.11
+
+--- Question 192 ---
+Question : Donne la liste des commandes dont le montant est supérieur à 10 000 euros.
+--- SQL brute ---
+SELECT c.id, c.date_commande, c.montant, c.client_id, c.produit_id FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE c.montant > 10000;
+--- SQL corrigée ---
+SELECT c.id, c.date_commande, c.montant, c.client_id, c.produit_id 
+FROM commandes c 
+WHERE c.montant > 10000;
+--- SQL validée ---
+SELECT c.id, c.date_commande, c.montant, c.client_id, c.produit_id 
+FROM commandes c 
+WHERE c.montant > 10000
+Temps (s) : 3.03
+
+--- Question 193 ---
+Question : Quel est le chiffre d'affaires total par catégorie et par trimestre ?
+--- SQL brute ---
+SELECT clients.secteur as trimestre, produits.categorie, SUM(commandes.montant) as chiffre_d_affaires FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY trimestre, produits.categorie;
+--- SQL corrigée ---
+SELECT clients.secteur as trimestre, produits.categorie, SUM(commandes.montant) as chiffre_d_affaires FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY trimestre, produits.categorie;
+--- SQL validée ---
+SELECT clients.secteur, SUM(commandes.montant) AS chiffre_d_affaires FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY trimestre, produits.categorie
+Temps (s) : 0.55
+
+--- Question 194 ---
+Question : Quel est le montant moyen des commandes passées par les clients de la ville de Lyon ?
+--- SQL brute ---
+SELECT AVG(c.montant) FROM commandes c INNER JOIN clients cl ON c.client_id = cl.id INNER JOIN produits p ON c.produit_id = p.id WHERE cl.ville = 'Lyon';
+--- SQL corrigée ---
+SELECT AVG(c.montant) FROM commandes c INNER JOIN clients cl ON c.client_id = cl.id INNER JOIN produits p ON c.produit_id = p.id WHERE cl.ville = 'Lyon';
+--- SQL validée ---
+SELECT AVG(c.montant) FROM commandes c INNER JOIN clients cl ON c.client_id = cl.id INNER JOIN produits p ON c.produit_id = p.id WHERE cl.ville = "Lyon"
+Temps (s) : 0.43
+
+--- Question 195 ---
+Question : Liste les produits commandés le dernier jour de chaque trimestre.
+--- SQL brute ---
+SELECT p.nom as produit_commande, c.date_commande, DATE_TRUNC('quarter', c.date_commande) as trimestre FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE c.date_commande >= DATE_TRUNC('quarter', CURRENT_DATE) - INTERVAL '1 day';
+--- SQL corrigée ---
+SELECT p.nom as produit_commande, c.date_commande, DATE_TRUNC('quarter', c.date_commande) as trimestre FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE c.date_commande >= DATE_TRUNC('quarter', CURRENT_DATE) - INTERVAL '1 day';
+--- SQL validée ---
+SELECT p.nom AS produit_commande, c.date_commande, DATE_TRUNC('quarter', c.date_commande) AS trimestre FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE c.date_commande >= DATE_TRUNC('quarter', CURRENT_DATE) - INTERVAL '1 day'
+Temps (s) : 0.18
+
+--- Question 196 ---
+Question : Quel est le nombre total de commandes pour chaque catégorie chaque trimestre ?
+--- SQL brute ---
+SELECT c.categorie, DATE_TRUNC('quarter', c.date_commande) as trimestre, COUNT(*) as nombre_commandes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.categorie, trimestre;
+--- SQL corrigée ---
+SELECT 
+  p.categorie, 
+  DATE_TRUNC('quarter', c.date_commande) AS trimestre, 
+  COUNT(*) AS nombre_commandes 
+FROM 
+  commandes c 
+  JOIN produits p ON c.produit_id = p.id 
+GROUP BY 
+  p.categorie, 
+  trimestre;
+--- SQL validée ---
+SELECT 
+  p.categorie, 
+  DATE_TRUNC('quarter', c.date_commande) AS trimestre, 
+  COUNT(*) AS nombre_commandes
+Temps (s) : 3.03
+
+--- Question 197 ---
+Question : Quel est le montant total des commandes pour chaque client, chaque ville et chaque année ?
+--- SQL brute ---
+SELECT clients.ville, fournisseurs.categorie_fournisseur, YEAR(commandes.date_commande) AS annee, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.fournisseur_id = fournisseurs.id GROUP BY clients.ville, fournisseurs.categorie_fournisseur, annee;
+--- SQL corrigée ---
+SELECT 
+  c.ville, 
+  f.categorie_fournisseur, 
+  YEAR(c.date_commande) AS annee, 
+  SUM(c.montant) 
+FROM 
+  commandes c 
+  JOIN clients c2 ON c.client_id = c2.id 
+GROUP BY 
+  c.ville, 
+  f.categorie_fournisseur, 
+  YEAR(c.date_commande);
+--- SQL validée ---
+SELECT 
+  c.ville, 
+  f.categorie_fournisseur, 
+  YEAR(c.date_commande) AS annee, 
+  SUM(c.montant)
+Temps (s) : 1.88
+
+--- Question 198 ---
+Question : Quel est le client ayant passé le plus de commandes chaque mois en 2024 ?
+--- SQL brute ---
+SELECT clients.nom, EXTRACT(MONTH FROM commandes.date_commande) as mois, COUNT(commandes.id) as nb_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom, mois ORDER BY nb_commandes DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT clients.nom, EXTRACT(MONTH FROM commandes.date_commande) as mois, COUNT(commandes.id) as nb_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom, mois ORDER BY nb_commandes DESC LIMIT 1;
+--- SQL validée ---
+SELECT clients.nom, EXTRACT(MONTH FROM commandes.date_commande) as mois, COUNT(commandes.id) as nb_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom, mois ORDER BY nb_commandes DESC LIMIT 1
+Temps (s) : 3.04
+
+--- Question 199 ---
+Question : Quel est le fournisseur dont les produits n'ont jamais été commandés en 2023 ?
+--- SQL brute ---
+SELECT fournisseurs.nom FROM fournisseurs LEFT JOIN produits ON fournisseurs.id = produits.fournisseur_id LEFT JOIN commandes ON produits.id = commandes.produit_id WHERE commandes.id IS NULL GROUP BY fournisseurs.nom;
+--- SQL corrigée ---
+INSERT INTO fournisseurs (id, nom, pays, categorie_fournisseur) 
+VALUES 
+(1, 'Fournisseur 1', 'France', 'A'),
+(2, 'Fournisseur 2', 'Allemagne', 'B'),
+(3, 'Fournisseur 3', 'Italie', 'A');
+--- SQL validée ---
+SELECT * FROM fournisseurs
+Temps (s) : 3.04
+
+--- Question 200 ---
+Question : Donne la liste des commandes passées par les clients n'ayant jamais commandé en 2023.
+--- SQL brute ---
+SELECT clients.nom FROM clients LEFT JOIN commandes ON clients.id = commandes.client_id LEFT JOIN produits ON commandes.produit_id = produits.id WHERE commandes.id IS NULL GROUP BY clients.nom;
+--- SQL corrigée ---
+SELECT
+--- SQL validée ---
+SELECT * FROM commandes WHERE NOT id IN (SELECT id FROM commandes WHERE date_commande = '2023')
+Temps (s) : 3.03
+
+--- Question 201 ---
+Question : Quel est le montant total des commandes pour chaque produit chaque mois ?
+--- SQL brute ---
+SELECT p.nom as produit_name, DATE_FORMAT(c.date_commande, '%Y-%m') as date_commande, SUM(c.montant) as total_commandes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom, date_commande;
+--- SQL corrigée ---
+SELECT p.nom as produit_name, DATE_FORMAT(c.date_commande, '%Y-%m') as date_commande, SUM(c.montant) as total_commandes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom, DATE_FORMAT(c.date_commande, '%Y-%m');
+--- SQL validée ---
+SELECT p.nom as produit_name, DATE_FORMAT(c.date_commande, '%Y-%m') as date_commande, SUM(c.montant) as total_commandes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom, DATE_FORMAT(c.date_commande, '%Y-%m')
+Temps (s) : 1.26
+
+--- Question 202 ---
+Question : Quel est le montant total des ventes pour chaque fournisseur chaque trimestre ?
+--- SQL brute ---
+SELECT clients.nom, EXTRACT(QUARTER FROM commandes.date_commande) AS trimestre, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom, trimestre;
+--- SQL corrigée ---
+SELECT 
+clients.nom, 
+EXTRACT(QUARTER FROM commandes.date_commande) AS trimestre, 
+SUM(commandes.montant) 
+FROM 
+commandes 
+JOIN clients ON commandes.client_id = clients.id 
+JOIN produits ON commandes.produit_id = produits.id 
+GROUP BY 
+clients.nom, trimestre;
+--- SQL validée ---
+SELECT 
+clients.nom, 
+EXTRACT(QUARTER FROM commandes.date_commande) AS trimestre, 
+SUM(commandes.montant) 
+FROM 
+commandes 
+JOIN clients ON commandes.client_id = clients.id 
+JOIN produits ON commandes.produit_id = produits.id 
+GROUP BY 
+clients.nom, trimestre
+Temps (s) : 3.01
+
+--- Question 203 ---
+Question : Liste les clients ayant commandé le même produit plusieurs fois en 2023.
+--- SQL brute ---
+SELECT clients.id, clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id HAVING COUNT(*) > 100;
+--- SQL corrigée ---
+SELECT c.id, c.nom
+FROM (
+  SELECT client_id, COUNT(*) as count
+  FROM commandes
+  WHERE date_commande >= '2023-01-01' AND date_commande < '2023-12-31'
+  GROUP BY client_id
+  HAVING COUNT(*) > 100
+) AS tmp
+INNER JOIN clients c ON tmp.client_id = c.id
+--- SQL validée ---
+SELECT c.id, c.nom
+FROM (
+  SELECT client_id, COUNT(*) as count
+  FROM commandes
+  WHERE date_commande >= '2023-01-01' AND date_commande < '2023-12-31'
+  GROUP BY client_id
+  HAVING COUNT(*) > 100
+) AS tmp
+INNER JOIN clients c ON tmp.client_id = c.id
+Temps (s) : 1.68
+
+--- Question 204 ---
+Question : Quel est le nombre total de commandes pour chaque combinaison de client, produit et fournisseur ?
+--- SQL brute ---
+SELECT c.client_id, p.produit_id, f.fournisseur_id FROM commandes c JOIN produits p ON c.produit_id = p.id LEFT JOIN fournisseurs f ON p.fournisseur_id = f.id;
+--- SQL corrigée ---
+CREATE TABLE produits (
+  id INT PRIMARY KEY,
+  nom VARCHAR(100),
+  description VARCHAR(200),
+  prix DECIMAL(10,2),
+  fournisseur_id INT
+);
+--- SQL validée ---
+SELECT T1.nom, T1.description, COUNT(*) FROM produits AS T1 JOIN commandes AS T2 ON T1.id = T2.produit_id JOIN fournisseurs AS T3 ON T1.fournisseur_id = T3.id GROUP BY T1.nom, T1.description
+Temps (s) : 3.05
+
+--- Question 205 ---
+Question : Quel est le montant total des ventes pour chaque produit chaque année ?
+--- SQL brute ---
+SELECT p.nom as produit_name, YEAR(c.date_commande) as year, SUM(c.montant) as total_sales FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY p.nom, year;
+--- SQL corrigée ---
+SELECT p.nom as produit_name, YEAR(c.date_commande) as year, SUM(c.montant) as total_sales FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom, YEAR(c.date_commande);
+--- SQL validée ---
+SELECT p.nom as produit_name, YEAR(c.date_commande) as year, SUM(c.montant) as total_sales FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom, YEAR(c.date_commande);
+Temps (s) : 2.46
+
+--- Question 206 ---
+Question : Quel est le nombre moyen de commandes passées par mois et par secteur ?
+--- SQL brute ---
+SELECT clients.secteur, EXTRACT(MONTH FROM commandes.date_commande) AS mois, AVG(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur, mois;
+--- SQL corrigée ---
+SELECT clients.secteur, EXTRACT(MONTH FROM commandes.date_commande) AS mois, AVG(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur, mois;
+--- SQL validée ---
+SELECT clients.secteur, EXTRACT(MONTH FROM commandes.date_commande) AS mois, AVG(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur, mois
+Temps (s) : 0.18
+
+--- Question 207 ---
+Question : Quel est le montant total des ventes réalisées par les clients du secteur 'Santé' ?
+--- SQL brute ---
+SELECT SUM(c.montant) FROM commandes c INNER JOIN clients cl ON c.client_id = cl.id INNER JOIN produits p ON c.produit_id = p.id WHERE cl.secteur = 'Santé';
+--- SQL corrigée ---
+SELECT 
+...
+--- SQL validée ---
+SELECT SUM(montant) FROM commandes WHERE client_id IN (SELECT id FROM clients WHERE secteur = 'health')
+Temps (s) : 1.25
+
+--- Question 208 ---
+Question : Quel est le client ayant commandé chaque trimestre de 2023 ?
+--- SQL brute ---
+SELECT clients.nom AS client, QUARTER(commandes.date_commande) AS trimestre, YEAR(commandes.date_commande) AS annee, SUM(commandes.montant) AS total_commande FROM commandes INNER JOIN clients ON commandes.client_id = clients.id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY client, trimestre, annee;
+--- SQL corrigée ---
+SELECT 
+    clients.nom AS client, 
+    QUARTER(DATE_TRUNC('month', commandes.date_commande)) AS trimestre, 
+    YEAR(DATE_TRUNC('month', commandes.date_commande)) AS annee, 
+    SUM(commandes.montant) AS total_commande 
+FROM 
+    commandes 
+JOIN 
+    clients ON commandes.client_id = clients.id 
+GROUP BY 
+    client, 
+    QUARTER(DATE_TRUNC('month', commandes.date_commande)), 
+    YEAR(DATE_TRUNC('month', commandes.date_commande));
+--- SQL validée ---
+SELECT 
+    clients.nom AS client, 
+    QUARTER(DATE_TRUNC('month', commandes.date_commande)) AS trimestre, 
+    YEAR(DATE_TRUNC('month', commandes.date_commande)) AS annee, 
+    SUM(commandes.montant) AS total_commande
+Temps (s) : 3.06
+
+--- Question 209 ---
+Question : Quel est le montant total des ventes pour chaque catégorie chaque trimestre ?
+--- SQL brute ---
+SELECT p.categorie, DATE_PART('quarter', c.date_commande) AS trimestre, SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie, trimestre;
+--- SQL corrigée ---
+SELECT p.categorie, DATE_TRUNC('quarter', c.date_commande) AS trimestre, SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie, trimestre;
+--- SQL validée ---
+SELECT p.categorie, DATE_TRUNC('quarter', c.date_commande) AS trimestre, SUM(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie, trimestre
+Temps (s) : 2.22
+
+--- Question 210 ---
+Question : Quel est le produit ayant été commandé le plus de fois chaque trimestre ?
+--- SQL brute ---
+SELECT produits.nom, SUM(commandes.montant) AS total_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY produits.nom ORDER BY total_commandes DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT 
+    DATE_TRUNC('quarter', c.date_commande) AS trimestre, 
+    p.nom AS produit, 
+    COUNT(*) AS nombre_commandes
+FROM 
+    commandes c 
+JOIN 
+    produits p ON c.produit_id = p.id 
+GROUP BY 
+    trimestre, produit 
+ORDER BY 
+    trimestre, nombre_commandes DESC;
+--- SQL validée ---
+SELECT 
+    DATE_TRUNC('quarter', c.date_commande) AS trimestre, 
+    p.nom AS produit, 
+    COUNT(*) AS nombre_commandes
+FROM 
+    commandes c 
+JOIN 
+    produits p ON c.produit_id = p.id 
+GROUP BY 
+    trimestre, produit 
+ORDER BY 
+    trimestre, nombre_commandes DESC
+Temps (s) : 1.62
+
+--- Question 211 ---
+Question : Quel est le fournisseur ayant le plus de produits référencés chaque année ?
+--- SQL brute ---
+SELECT fournisseurs.nom AS fournisseur, YEAR(commandes.date_commande) AS année, COUNT(DISTINCT produits.id) AS produits_référencés FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.fournisseur_id = fournisseurs.id GROUP BY fournisseur, année ORDER BY produits_référencés DESC;
+--- SQL corrigée ---
+SELECT fournisseurs.nom AS fournisseur, YEAR(commandes.date_commande) AS année, COUNT(DISTINCT produits.id) AS produits_référencés FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.fournisseur_id = fournisseurs.id GROUP BY fournisseur, année ORDER BY produits_référencés DESC;
+--- SQL validée ---
+SELECT fournisseurs.nom AS fournisseur, YEAR(commandes.date_commande) AS année, COUNT(DISTINCT produits.id) AS produits_référencés FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.fournisseur_id = fournisseurs.id GROUP BY fournisseur, année ORDER BY produits_référencés DESC
+Temps (s) : 0.42
+
+--- Question 212 ---
+Question : Combien de clients ont passé des commandes chaque trimestre en 2024 ?
+--- SQL brute ---
+SELECT DATE_PART('quarter', date_commande) AS trimestre, COUNT(DISTINCT clients.id) AS nombre_clients FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY trimestre;
+--- SQL corrigée ---
+SELECT 
+  QUARTER(date_commande) AS trimestre, 
+  COUNT(DISTINCT client_id) AS nombre_clients 
+FROM 
+  commandes 
+GROUP BY 
+  QUARTER(date_commande);
+--- SQL validée ---
+SELECT 
+  QUARTER(date_commande) AS trimestre, 
+  COUNT(DISTINCT client_id) AS nombre_clients 
+FROM 
+  commandes 
+GROUP BY 
+  QUARTER(date_commande)
+Temps (s) : 3.07
+
+--- Question 213 ---
+Question : Quel est le montant total des ventes réalisées en 2023 par catégorie ?
+--- SQL brute ---
+SELECT c.categorie, SUM(c.montant) as total_ventes FROM commandes c INNER JOIN clients cl ON c.client_id = cl.id INNER JOIN produits p ON c.produit_id = p.id GROUP BY c.categorie;
+--- SQL corrigée ---
+SELECT p.categorie, SUM(c.montant) as total_ventes
+FROM commandes c
+JOIN produits p ON c.produit_id = p.id
+WHERE EXTRACT(YEAR FROM c.date_commande) = 2023
+GROUP BY p.categorie;
+--- SQL validée ---
+SELECT p.categorie, SUM(c.montant) as total_ventes
+FROM commandes c
+JOIN produits p ON c.produit_id = p.id
+WHERE EXTRACT(YEAR FROM c.date_commande) = 2023
+GROUP BY p.categorie
+Temps (s) : 0.87
+
+--- Question 214 ---
+Question : Quel est le produit le plus vendu à chaque fournisseur ?
+--- SQL brute ---
+SELECT fournisseurs.nom, produits.nom AS produit_vendu, SUM(commandes.montant) AS total_vendu FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom, produits.nom;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, produits.nom AS produit_vendu, SUM(commandes.montant) AS total_vendu FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom, produits.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom, produits.nom AS produit_vendu, SUM(commandes.montant) AS total_vendu FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom, produits.nom ORDER BY SUM(commandes.montant) DESC
+Temps (s) : 0.67
+
+--- Question 215 ---
+Question : Quel est le nombre total de commandes pour chaque secteur chaque mois ?
+--- SQL brute ---
+SELECT clients.secteur, EXTRACT(MONTH FROM commandes.date_commande) as mois, COUNT(commandes.id) as nombre_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur, mois;
+--- SQL corrigée ---
+SELECT 
+  clients.secteur, 
+  EXTRACT(MONTH FROM commandes.date_commande) as mois, 
+  COUNT(commandes.id) as nombre_commandes 
+FROM 
+  commandes 
+JOIN 
+  clients ON commandes.client_id = clients.id 
+GROUP BY 
+  clients.secteur, 
+  EXTRACT(MONTH FROM commandes.date_commande);
+--- SQL validée ---
+SELECT 
+  clients.secteur, 
+  EXTRACT(MONTH FROM commandes.date_commande) AS mois, 
+  COUNT(commandes.id) AS nombre_commandes
+Temps (s) : 1.01
+
+--- Question 216 ---
+Question : Quel est le montant total des ventes réalisées chaque jour en 2024 ?
+--- SQL brute ---
+SELECT j.jour, SUM(c.montant) as total_ventes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits pr ON c.produit_id = pr.id GROUP BY j.jour;
+--- SQL corrigée ---
+INSERT INTO fournisseurs (id, nom, pays, categorie_fournisseur) VALUES
+  (1, 'Fournisseur A', 'France', 'Fournisseur de produits A'),
+  (2, 'Fournisseur B', 'Allemagne', 'Fournisseur de produits B');
+--- SQL validée ---
+SELECT SUM(montant) FROM commandes WHERE date_commande BETWEEN '2024-01-01' AND '2024-12-31'
+Temps (s) : 3.06
+
+--- Question 217 ---
+Question : Donne la liste des commandes annulées pour chaque client.
+--- SQL brute ---
+SELECT c.id, c.date_commande, c.montant, c.client_id, p.id, p.nom, p.categorie, p.prix_unitaire FROM commandes c JOIN produits p ON c.produit_id = p.id;
+--- SQL corrigée ---
+SELECT c.id, c.date_commande, c.montant, c.client_id, p.id, p.nom, p.categorie, p.prix_unitaire
+FROM commandes c
+JOIN clients cl ON c.client_id = cl.id
+WHERE c.montant = 0;
+--- SQL validée ---
+SELECT c.id, c.date_commande, c.montant, c.client_id, p.id, p.nom, p.categorie, p.prix_unitaire
+FROM commandes c
+JOIN clients cl ON c.client_id = cl.id
+WHERE c.montant = 0
+Temps (s) : 3.06
+
+--- Question 218 ---
+Question : Quel est le client ayant commandé le plus de produits par catégorie ?
+--- SQL brute ---
+SELECT c.client_id, p.categorie, COUNT(c.id) as nombre_commandes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY c.client_id, p.categorie ORDER BY nombre_commandes DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT
+--- SQL validée ---
+SELECT commandes.client_id FROM commandes, produits WHERE commandes.produit_id = produits.id ORDER BY produits.categorie DESC LIMIT 1
+Temps (s) : 1.55
+
+--- Question 219 ---
+Question : Quel est le montant total des ventes réalisées par fournisseur et par ville ?
+--- SQL brute ---
+SELECT clients.ville, fournisseurs.nom, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY clients.ville, fournisseurs.nom;
+--- SQL corrigée ---
+SELECT
+    fournisseurs.nom,
+    clients.ville,
+    SUM(commandes.montant)
+FROM
+    commandes
+JOIN
+    clients ON commandes.client_id = clients.id
+JOIN
+    produits ON commandes.produit_id = produits.id
+JOIN
+    fournisseurs ON produits.id = fournisseurs.id
+GROUP BY
+    clients.ville, fournisseurs.nom;
+--- SQL validée ---
+SELECT
+    fournisseurs.nom,
+    clients.ville,
+    SUM(commandes.montant)
+FROM
+    commandes
+JOIN
+    clients ON commandes.client_id = clients.id
+JOIN
+    produits ON commandes.produit_id = produits.id
+JOIN
+    fournisseurs ON produits.id = fournisseurs.id
+Temps (s) : 3.06
+
+--- Question 220 ---
+Question : Quel est le fournisseur ayant vendu des produits à tous les clients du secteur 'Education' ?
+--- SQL brute ---
+SELECT fournisseur_id FROM ventes WHERE produit_id IN (SELECT id FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id WHERE clients.secteur = 'Education' GROUP BY fournisseur_id HAVING COUNT(DISTINCT produit_id) = (SELECT COUNT(*) FROM produits JOIN ventes ON produits.id = ventes.produit_id WHERE produits.categorie = 'Education' GROUP BY ventes.fournisseur_id ORDER BY COUNT(*) DESC LIMIT 1));
+--- SQL corrigée ---
+SELECT fournisseur_id 
+FROM ventes 
+WHERE produit_id IN (
+  SELECT produits.id 
+  FROM produits 
+  JOIN commandes ON produits.id = commandes.produit_id 
+  JOIN clients ON commandes.client_id = clients.id 
+  WHERE clients.secteur = 'Education' 
+  GROUP BY produits.id 
+  HAVING COUNT(DISTINCT commandes.id) = (
+    SELECT COUNT(*) 
+    FROM produits 
+    JOIN ventes ON produits.id = ventes.produit_id 
+    WHERE produits.categorie = 'Education' 
+    GROUP BY ventes.fournisseur_id 
+    ORDER BY COUNT(*) DESC 
+    LIMIT 1
+  )
+)
+--- SQL validée ---
+SELECT fournisseur_id 
+FROM ventes 
+WHERE produit_id IN (
+  SELECT produits.id 
+  FROM produits 
+  JOIN commandes ON produits.id = commandes.produit_id 
+  JOIN clients ON commandes.client_id = clients.id 
+  WHERE clients.secteur = 'Education' 
+  GROUP BY produits.id 
+  HAVING COUNT(DISTINCT commandes.id) = (
+    SELECT COUNT(*) 
+    FROM produits 
+    JOIN ventes ON produits.id = ventes.produit_id 
+    WHERE produits.categorie = 'Education' 
+    GROUP BY ventes.fournisseur_id 
+    ORDER BY COUNT(*) DESC 
+    LIMIT 1
+  )
+Temps (s) : 2.82
+
+--- Question 221 ---
+Question : Quel est le client ayant commandé le plus de produits de chaque catégorie ?
+--- SQL brute ---
+SELECT clients.secteur, fournisseurs.categorie_fournisseur, produits.categorie, COUNT(*) as nombre_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY clients.secteur, fournisseurs.categorie_fournisseur, produits.categorie ORDER BY nombre_commandes DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT DISTINCT clients.secteur, fournisseurs.categorie_fournisseur, produits.categorie, COUNT(*) as nombre_commandes 
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id 
+JOIN produits ON commandes.produit_id = produits.id 
+JOIN fournisseurs ON produits.id = fournisseurs.id 
+GROUP BY clients.secteur, fournisseurs.categorie_fournisseur, produits.categorie 
+ORDER BY clients.secteur, fournisseurs.categorie_fournisseur, produits.categorie, nombre_commandes DESC 
+LIMIT 1;
+--- SQL validée ---
+SELECT DISTINCT clients.secteur, fournisseurs.categorie_fournisseur, produits.categorie, COUNT(*) as nombre_commandes 
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id 
+JOIN produits ON commandes.produit_id = produits.id 
+JOIN fournisseurs ON produits.id = fournisseurs.id 
+GROUP BY clients.secteur, fournisseurs.categorie_fournisseur, produits.categorie 
+ORDER BY clients.secteur, fournisseurs.categorie_fournisseur, produits.categorie, nombre_commandes DESC 
+LIMIT 1
+Temps (s) : 2.55
+
+--- Question 222 ---
+Question : Liste les commandes passées lors du Cyber Monday.
+--- SQL brute ---
+SELECT * FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id WHERE c.date_commande = '2022-01-01';
+--- SQL corrigée ---
+SELECT * FROM commandes WHERE date_commande = '2022-01-01';
+--- SQL validée ---
+SELECT * FROM commandes WHERE date_commande = '2022-01-01'
+Temps (s) : 0.29
+
+--- Question 223 ---
+Question : Quel est le montant total des ventes réalisées en 2024 par fournisseur ?
+--- SQL brute ---
+SELECT fournisseurs.nom, SUM(commandes.montant) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id WHERE clients.ville = 'Roubaix' AND fournisseurs.categorie_fournisseur = 'Indérect' GROUP BY fournisseurs.nom;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) FROM fournisseurs 
+INNER JOIN produits ON fournisseurs.id = produits.id 
+INNER JOIN commandes ON produits.id = commandes.produit_id 
+WHERE fournisseurs.categorie_fournisseur = 'Indérect' AND commandes.date_commande >= '2024-01-01' 
+GROUP BY fournisseurs.nom 
+ORDER BY fournisseurs.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) FROM fournisseurs 
+INNER JOIN produits ON fournisseurs.id = produits.id 
+INNER JOIN commandes ON produits.id = commandes.produit_id 
+WHERE fournisseurs.categorie_fournisseur = 'Indérect' AND commandes.date_commande >= '2024-01-01' 
+GROUP BY fournisseurs.nom
+Temps (s) : 3.04
+
+--- Question 224 ---
+Question : Donne la liste des produits commandés uniquement par les clients du secteur 'Santé'.
+--- SQL brute ---
+SELECT produits.nom FROM produits JOIN commandes ON produits.id = commandes.produit_id JOIN clients ON commandes.client_id = clients.id WHERE clients.secteur = 'Santé';
+--- SQL corrigée ---
+SELECT 
+;
+--- SQL validée ---
+SELECT
+Temps (s) : 0.86
+
+--- Question 225 ---
+Question : Quel est le montant total des commandes pour chaque client et chaque fournisseur ?
+--- SQL brute ---
+SELECT c.client_id, p.fournisseur_id, SUM(c.montant) FROM commandes c INNER JOIN clients cl ON c.client_id = cl.id INNER JOIN produits p ON c.produit_id = p.id INNER JOIN fournisseurs f ON p.fournisseur_id = f.id GROUP BY c.client_id, p.fournisseur_id;
+--- SQL corrigée ---
+SELECT c.client_id, f.fournisseur_id, SUM(c.montant) FROM commandes c 
+INNER JOIN clients c1 ON c.client_id = c1.id 
+INNER JOIN produits p ON c.produit_id = p.id 
+INNER JOIN fournisseurs f ON p.fournisseur_id = f.id 
+GROUP BY c.client_id, f.fournisseur_id;
+--- SQL validée ---
+SELECT c.client_id, f.fournisseur_id, SUM(c.montant) FROM commandes c 
+INNER JOIN clients c1 ON c.client_id = c1.id 
+INNER JOIN produits p ON c.produit_id = p.id 
+INNER JOIN fournisseurs f ON p.fournisseur_id = f.id
+Temps (s) : 1.97
+
+--- Question 226 ---
+Question : Quel est le nombre moyen de commandes passées par trimestre et par client ?
+--- SQL brute ---
+SELECT AVG(c.montant) as moyenne_commandes, c.client_id FROM commandes c GROUP BY c.client_id;
+--- SQL corrigée ---
+SELECT 
+  AVG(c.montant) as moyenne_commandes, 
+  c.client_id 
+FROM 
+  commandes c 
+WHERE 
+  (SELECT DATE_PART('quarter', c.date_commande)) > 1 
+GROUP BY 
+  c.client_id;
+--- SQL validée ---
+SELECT AVG(montant), client_id FROM commandes WHERE (SELECT DATE_PART('quarter', date_commande) > 1) GROUP BY client_id
+Temps (s) : 0.89
+
+--- Question 227 ---
+Question : Combien de commandes ont été passées lors du dernier trimestre de 2023 ?
+--- SQL brute ---
+SELECT COUNT(*) FROM commandes AS cmd JOIN clients AS clt ON cmd.client_id = clt.id JOIN produits AS pdt ON cmd.produit_id = pdt.id WHERE cmd.date_commande >= '2023-01-01' AND cmd.date_commande <= '2023-03-31';
+--- SQL corrigée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande >= '2023-01-01' AND date_commande <= '2023-03-31';
+--- SQL validée ---
+SELECT COUNT(*) FROM commandes WHERE date_commande >= '2023-01-01' AND date_commande <= '2023-03-31';
+Temps (s) : 0.57
+
+--- Question 228 ---
+Question : Quel est le montant total des ventes pour chaque jour de la semaine en 2023 ?
+--- SQL brute ---
+SELECT DATE_TRUNC('week', date_commande) as semaine, SUM(montant) FROM commandes INNER JOIN clients ON commandes.client_id = clients.id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY semaine;
+--- SQL corrigée ---
+SELECT 
+    DATE_TRUNC('week', date_commande) AS semaine, 
+    SUM(montant) AS total_ventes
+FROM 
+    commandes
+GROUP BY 
+    DATE_TRUNC('week', date_commande);
+--- SQL validée ---
+SELECT 
+    DATE_TRUNC('week', date_commande) AS semaine, 
+    SUM(montant) AS total_ventes
+FROM 
+    commandes
+GROUP BY 
+    DATE_TRUNC('week', date_commande)
+Temps (s) : 3.04
+
+--- Question 229 ---
+Question : Liste les clients ayant commandé chaque mois et chaque trimestre.
+--- SQL brute ---
+SELECT EXTRACT(MONTH FROM date_commande) as mois, EXTRACT(QUARTER FROM date_commande) as trimestre, clients.nom, COUNT(DISTINCT commandes.id) as nombre_commandes FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY mois, trimestre, clients.nom;
+--- SQL corrigée ---
+SELECT 
+  EXTRACT(MONTH FROM date_commande) AS mois, 
+  EXTRACT(QUARTER FROM date_commande) AS trimestre, 
+  clients.nom, 
+  COUNT(DISTINCT commandes.id) AS nombre_commandes 
+FROM 
+  clients 
+  INNER JOIN commandes ON clients.id = commandes.client_id 
+GROUP BY 
+  EXTRACT(MONTH FROM date_commande), 
+  EXTRACT(QUARTER FROM date_commande), 
+  clients.nom;
+--- SQL validée ---
+SELECT 
+  EXTRACT(MONTH FROM date_commande) AS mois, 
+  EXTRACT(QUARTER FROM date_commande) AS trimestre, 
+  clients.nom, 
+  COUNT(DISTINCT commandes.id) AS nombre_commandes 
+FROM 
+  clients 
+  INNER JOIN commandes ON clients.id = commandes.client_id 
+GROUP BY 
+  EXTRACT(MONTH FROM date_commande), 
+  EXTRACT(QUARTER FROM date_commande), 
+  clients.nom
+Temps (s) : 2.23
+
+--- Question 230 ---
+Question : Quel est le fournisseur ayant vendu le plus de produits chaque jour en 2024 ?
+--- SQL brute ---
+SELECT fournisseurs.nom, ROUND(SUM(commandes.montant)/COUNT(DISTINCT commandes.date_commande), 2) as montant_par_jour FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom ORDER BY montant_par_jour DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, 
+       SUM(commandes.montant) as total_montant, 
+       COUNT(DISTINCT commandes.date_commande) as nb_jours
+FROM commandes
+INNER JOIN produits ON commandes.produit_id = produits.id
+INNER JOIN fournisseurs ON produits.id = fournisseurs.id
+WHERE commandes.date_commande BETWEEN '2024-01-01' AND '2024-12-31'
+GROUP BY fournisseurs.nom
+ORDER BY total_montant DESC, nb_jours DESC
+LIMIT 1;
+--- SQL validée ---
+SELECT fournisseurs.nom, SUM(commandes.montant) as total_montant, COUNT(DISTINCT commandes.date_commande) as nb_jours
+FROM commandes
+INNER JOIN produits ON commandes.produit_id = produits.id
+INNER JOIN fournisseurs ON produits.id = fournisseurs.id
+WHERE commandes.date_commande BETWEEN '2024-01-01' AND '2024-12-31'
+GROUP BY fournisseurs.nom
+ORDER BY total_montant DESC, nb_jours DESC
+Temps (s) : 3.05
+
+--- Question 231 ---
+Question : Quel est le produit le plus vendu chaque jour en 2024 ?
+--- SQL brute ---
+SELECT p.nom, COUNT(c.id) as jour_plus_vendu FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom ORDER BY jour_plus_vendu DESC LIMIT 1;
+--- SQL corrigée ---
+INSERT INTO produits (id, nom, categorie, prix_unitaire) VALUES
+  (1, 'Produit A', 'Catégorie A', 10.00),
+  (2, 'Produit B', 'Catégorie B', 20.00),
+  (3, 'Produit C', 'Catégorie C', 30.00),
+  (4, 'Produit D', 'Catégorie A', 40.00),
+  (5, 'Produit E', 'Catégorie B', 50.00);
+--- SQL validée ---
+SELECT nom, prix_unitaire, date_commande FROM produits AS T1 JOIN commandes AS T2 ON T1.id = T2.produit_id WHERE date_commande BETWEEN '2024-01-01' AND '2024-12-31' AND T1.prix_unitaire = (SELECT MIN(prix_unitaire) FROM produits WHERE id = T2.produit_id)
+Temps (s) : 3.03
+
+--- Question 232 ---
+Question : Quel est le client ayant le plus commandé chaque semaine ?
+--- SQL brute ---
+SELECT clients.nom AS client_plus_commandé_chaque_sem, MAX(SUM(commandes.montant)) AS somme_commandes FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom;
+--- SQL corrigée ---
+SELECT 
+  clients.nom AS client_plus_commandé_chaque_sem,
+  SUM(commandes.montant) AS somme_commandes
+FROM 
+  clients
+  JOIN commandes ON clients.id = commandes.client_id
+GROUP BY 
+  clients.nom
+ORDER BY 
+  somme_commandes DESC;
+--- SQL validée ---
+SELECT 
+  clients.nom AS client_plus_commandé_chaque_sem,
+  SUM(commandes.montant) AS somme_commandes
+FROM 
+  clients
+  JOIN commandes ON clients.id = commandes.client_id
+Temps (s) : 1.6
+
+--- Question 233 ---
+Question : Quel est le montant total des ventes réalisées en ligne chaque mois ?
+--- SQL brute ---
+SELECT EXTRACT(MONTH FROM date_commande) as mois, SUM(montant) as total_ventes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY mois;
+--- SQL corrigée ---
+SELECT 
+  EXTRACT(MONTH FROM date_commande) as mois, 
+  SUM(montant) as total_ventes 
+FROM 
+  commandes 
+GROUP BY 
+  EXTRACT(MONTH FROM date_commande)
+--- SQL validée ---
+SELECT 
+  EXTRACT(MONTH FROM date_commande) as mois, 
+  SUM(montant) as total_ventes 
+FROM 
+  commandes 
+GROUP BY 
+  EXTRACT(MONTH FROM date_commande)
+Temps (s) : 3.04
+
+--- Question 234 ---
+Question : Combien de produits différents ont été commandés en décembre 2024 ?
+--- SQL brute ---
+SELECT COUNT(DISTINCT p.id) FROM commandes c JOIN produits p ON c.produit_id = p.id WHERE c.date_commande BETWEEN '2024-12-01' AND '2024-12-31';
+--- SQL corrigée ---
+SELECT COUNT(DISTINCT c.produit_id) FROM commandes c WHERE c.date_commande BETWEEN '2024-12-01' AND '2024-12-31';
+--- SQL validée ---
+SELECT COUNT(DISTINCT c.produit_id) FROM commandes c WHERE c.date_commande BETWEEN '2024-12-01' AND '2024-12-31
+Temps (s) : 3.04
+
+--- Question 235 ---
+Question : Quel est le fournisseur dont les produits n'ont jamais été commandés par les clients de Paris ?
+--- SQL brute ---
+SELECT fournisseurs.nom FROM fournisseurs LEFT JOIN produits ON fournisseurs.id = produits.fournisseur_id LEFT JOIN commandes ON produits.id = commandes.produit_id JOIN clients ON commandes.client_id = clients.id WHERE clients.ville != 'Paris' GROUP BY fournisseurs.nom HAVING COUNT(DISTINCT produits.id) = 0;
+--- SQL corrigée ---
+SELECT fournisseurs.nom
+FROM fournisseurs
+WHERE fournisseurs.id NOT IN (
+  SELECT produits.fournisseur_id
+  FROM produits
+  WHERE produits.id IN (
+    SELECT commandes.produit_id
+    FROM commandes
+    WHERE commandes.client_id IN (
+      SELECT clients.id
+      FROM clients
+      WHERE clients.ville = 'Paris'
+    )
+  )
+);
+--- SQL validée ---
+SELECT fournisseurs.nom
+FROM fournisseurs
+WHERE fournisseurs.id NOT IN (
+  SELECT produits.fournisseur_id
+  FROM produits
+  WHERE produits.id IN (
+    SELECT commandes.produit_id
+    FROM commandes
+    WHERE commandes.client_id IN (
+      SELECT clients.id
+      FROM clients
+      WHERE clients.ville = 'Paris'
+    )
+Temps (s) : 2.85
+
+--- Question 236 ---
+Question : Quel est le montant total des ventes pour chaque fournisseur chaque année ?
+--- SQL brute ---
+SELECT clients.nom, EXTRACT(YEAR FROM commandes.date_commande) AS year, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom, year;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, EXTRACT(YEAR FROM commandes.date_commande) AS year, SUM(commandes.montant) FROM commandes
+JOIN clients ON commandes.client_id = clients.id
+JOIN fournisseurs ON clients.id = fournisseurs.id
+GROUP BY fournisseurs.nom, year;
+--- SQL validée ---
+SELECT fournisseurs.nom, EXTRACT(YEAR FROM commandes.date_commande) AS year, SUM(commandes.montant) FROM commandes
+JOIN clients ON commandes.client_id = clients.id
+JOIN fournisseurs ON clients.id = fournisseurs.id
+GROUP BY fournisseurs.nom, year
+Temps (s) : 3.05
+
+--- Question 237 ---
+Question : Quel est le client ayant commandé le plus de produits différents chaque trimestre ?
+--- SQL brute ---
+SELECT clients.nom, COUNT(DISTINCT EXTRACT(QUARTER FROM commandes.date_commande)) AS trimestre, MAX(COUNT(DISTINCT EXTRACT(QUARTER FROM commandes.date_commande))) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom;
+--- SQL corrigée ---
+SELECT clients.nom, COUNT(DISTINCT EXTRACT(QUARTER FROM commandes.date_commande)) AS trimestre, MAX(COUNT(DISTINCT EXTRACT(QUARTER FROM commandes.date_commande))) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom;
+--- SQL validée ---
+SELECT clients.nom, COUNT(DISTINCT EXTRACT(QUARTER FROM commandes.date_commande)) AS trimestre, MAX(COUNT(DISTINCT EXTRACT(QUARTER FROM commandes.date_commande))) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom
+Temps (s) : 0.65
+
+--- Question 238 ---
+Question : Quel est le montant total des commandes annulées chaque trimestre ?
+--- SQL brute ---
+SELECT DATE_FORMAT(date_commande, '%Y-%m') as trimestre, SUM(montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY trimestre;
+--- SQL corrigée ---
+SELECT 
+  DATE_FORMAT(date_commande, '%Y-%m-01') AS trimestre,
+  SUM(montant) AS total_commandes_annulees
+FROM 
+  commandes
+WHERE 
+  date_commande < DATE_SUB(DATE_FORMAT(CURDATE(), '%Y-%m-01') + INTERVAL 3 MONTH, INTERVAL 1 MONTH)
+GROUP BY 
+  trimestre
+--- SQL validée ---
+SELECT 
+  date_commande, SUM(montant) FROM commandes WHERE date_commande < DATE_ADD(CURRENT_TIMESTAMP(), -3, 'month') GROUP BY date_commande
+Temps (s) : 1.83
+
+--- Question 239 ---
+Question : Donne la liste des produits commandés par chaque client chaque trimestre.
+--- SQL brute ---
+SELECT c.client_id, p.nom, DATE_FORMAT(c.date_commande, '%Y-%m') as mois, ROUND(SUM(c.montant), 2) as total_commandes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY c.client_id, p.nom, mois ORDER BY mois, total_commandes DESC;
+--- SQL corrigée ---
+SELECT 
+  c.client_id, 
+  p.nom, 
+  QUARTER(c.date_commande) as trimestre, 
+  SUM(c.montant) as total_commandes 
+FROM 
+  commandes c 
+  JOIN produits p ON c.produit_id = p.id 
+GROUP BY 
+  c.client_id, 
+  p.nom, 
+  trimestre 
+ORDER BY 
+  trimestre, 
+  total_commandes DESC;
+--- SQL validée ---
+SELECT 
+  c.client_id, 
+  p.nom, 
+  QUARTER(c.date_commande) as trimestre, 
+  SUM(c.montant) as total_commandes 
+FROM 
+  commandes c 
+  JOIN produits p ON c.produit_id = p.id 
+GROUP BY 
+  c.client_id, 
+  p.nom, 
+  trimestre 
+ORDER BY 
+  trimestre, 
+  total_commandes DESC
+Temps (s) : 1.57
+
+--- Question 240 ---
+Question : Quel est le montant moyen des commandes pour chaque secteur et chaque année ?
+--- SQL brute ---
+SELECT clients.secteur, DATE_FORMAT(commandes.date_commande, '%Y') AS Annee, AVG(commandes.montant) AS Moyenne FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur, Annee;
+--- SQL corrigée ---
+SELECT clients.secteur, DATE_FORMAT(commandes.date_commande, '%Y') AS Annee, AVG(commandes.montant) AS Moyenne
+FROM commandes
+JOIN clients ON commandes.client_id = clients.id
+GROUP BY clients.secteur, DATE_FORMAT(commandes.date_commande, '%Y');
+--- SQL validée ---
+SELECT clients.secteur, DATE_FORMAT(commandes.date_commande, '%Y') AS Annee, AVG(commandes.montant) AS Moyenne
+Temps (s) : 2.02
+
+--- Question 241 ---
+Question : Quel est le nombre total de commandes pour chaque produit chaque semaine ?
+--- SQL brute ---
+SELECT p.nom, DATE_FORMAT(c.date_commande, '%Y-%m-%d') as date, COUNT(c.id) as nombre_commandes FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.nom, date;
+--- SQL corrigée ---
+SELECT p.nom, DATE_FORMAT(c.date_commande, '%Y-%w') as date, COUNT(c.id) as nombre_commandes
+FROM commandes c
+JOIN produits p ON c.produit_id = p.id
+GROUP BY p.nom, date
+--- SQL validée ---
+SELECT p.nom, DATE_FORMAT(c.date_commande, '%Y-%W') AS date, COUNT(c.id) AS nombre_commandes
+FROM commandes c
+JOIN produits p ON c.produit_id = p.id
+Temps (s) : 2.37
+
+--- Question 242 ---
+Question : Quel est le fournisseur ayant généré le moins de chiffre d'affaires chaque année ?
+--- SQL brute ---
+SELECT fournisseurs.nom, MIN(SUM(commandes.montant)) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, MIN(SUM(commandes.montant)) FROM fournisseurs INNER JOIN produits ON fournisseurs.id = produits.id INNER JOIN commandes ON produits.id = commandes.produit_id GROUP BY fournisseurs.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom, MIN(SUM(commandes.montant)) FROM fournisseurs INNER JOIN produits ON fournisseurs.id = produits.id INNER JOIN commandes ON produits.id = commandes.produit_id GROUP BY fournisseurs.nom
+Temps (s) : 1.37
+
+--- Question 243 ---
+Question : Quel est le montant total des ventes pour chaque secteur chaque année ?
+--- SQL brute ---
+SELECT c.date_commande, p.nom as produit, f.nom as fournisseur, SUM(c.montant) as total_ventes FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id LEFT JOIN fournisseurs f ON p.fournisseur_id = f.id GROUP BY c.date_commande, p.nom, f.nom;
+--- SQL corrigée ---
+SELECT 
+  cl.secteur, 
+  DATE(c.date_commande) AS annee, 
+  SUM(c.montant) AS total_ventes 
+FROM 
+  commandes c 
+  JOIN clients cl ON c.client_id = cl.id 
+GROUP BY 
+  cl.secteur, 
+  DATE(c.date_commande)
+ORDER BY 
+  cl.secteur, 
+  annee;
+--- SQL validée ---
+SELECT 
+  cl.secteur, 
+  DATE(c.date_commande) AS annee, 
+  SUM(c.montant) AS total_ventes 
+FROM 
+  commandes c 
+  JOIN clients cl ON c.client_id = cl.id 
+GROUP BY 
+  cl.secteur, 
+  DATE(c.date_commande)
+Temps (s) : 3.04
+

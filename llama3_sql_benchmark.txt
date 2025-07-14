@@ -1,0 +1,278 @@
+--- Question 01 ---
+Question : Quel est le montant total des commandes par client ?
+--- SQL brute ---
+SELECT clients.nom, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom;
+--- SQL corrigée ---
+SELECT clients.nom, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom;
+--- SQL validée ---
+SELECT clients.nom, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom
+Temps (s) : 0.19
+
+--- Question 02 ---
+Question : Combien de commandes ont été passées dans chaque ville ?
+--- SQL brute ---
+SELECT clients.ville, COUNT(*) as nb_commandes FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.ville;
+--- SQL corrigée ---
+SELECT 
+    ville,
+    COUNT(*) as nb_commandes
+FROM 
+    clients
+INNER JOIN 
+    commandes 
+    ON clients.id = commandes.client_id
+GROUP BY 
+    ville;
+--- SQL validée ---
+SELECT 
+    ville,
+    COUNT(*) AS nb_commandes
+FROM 
+    clients
+INNER JOIN 
+    commandes
+    ON clients.id = commandes.client_id
+GROUP BY 
+    ville
+Temps (s) : 3.07
+
+--- Question 03 ---
+Question : Quelle est la commande ayant le montant le plus élevé ?
+--- SQL brute ---
+SELECT clients.id, clients.nom, MAX(commandes.montant) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id;
+--- SQL corrigée ---
+SELECT * FROM (
+  SELECT commandes.montant, clients.nom
+  FROM commandes
+  INNER JOIN clients ON commandes.client_id = clients.id
+  INNER JOIN produits ON commandes.produit_id = produits.id
+  ORDER BY commandes.montant DESC
+  LIMIT 1
+) AS result;
+--- SQL validée ---
+SELECT * FROM (
+  SELECT commandes.montant, clients.nom
+  FROM commandes
+  INNER JOIN clients ON commandes.client_id = clients.id
+  INNER JOIN produits ON commandes.produit_id = produits.id
+  ORDER BY commandes.montant DESC
+  LIMIT 1
+Temps (s) : 3.02
+
+--- Question 04 ---
+Question : Donne la liste des clients ayant passé plus de 3 commandes.
+--- SQL brute ---
+SELECT clients.nom FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom HAVING COUNT(*) > 3;
+--- SQL corrigée ---
+SELECT nom
+FROM clients
+WHERE id IN (
+  SELECT client_id
+  FROM commandes
+  GROUP BY client_id
+  HAVING COUNT(*) > 3
+);
+--- SQL validée ---
+SELECT nom
+FROM clients
+WHERE id IN (
+  SELECT client_id
+  FROM commandes
+  GROUP BY client_id
+  HAVING COUNT(*) > 3
+Temps (s) : 1.11
+
+--- Question 05 ---
+Question : Quel est le chiffre d'affaires total par secteur de client ?
+--- SQL brute ---
+SELECT clients.secteur, SUM(commandes.montant) as total_ca_par_secteur FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur;
+--- SQL corrigée ---
+SELECT clients.secteur, SUM(commandes.montant) as total_ca_par_secteur 
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id 
+GROUP BY clients.secteur;
+--- SQL validée ---
+SELECT clients.secteur, SUM(commandes.montant) AS total_ca_par_secteur FROM commandes JOIN clients ON commandes.client_id = clients.id GROUP BY clients.secteur
+Temps (s) : 1.68
+
+--- Question 06 ---
+Question : Quel est le produit le plus vendu en termes de montant total ?
+--- SQL brute ---
+SELECT produits.nom, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY produits.nom ORDER BY SUM(commandes.montant) DESC LIMIT 1;
+--- SQL corrigée ---
+SELECT produits.nom, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY produits.nom ORDER BY SUM(commandes.montant) DESC LIMIT 1;
+--- SQL validée ---
+SELECT produits.nom, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY produits.nom ORDER BY SUM(commandes.montant) DESC LIMIT 1
+Temps (s) : 0.79
+
+--- Question 07 ---
+Question : Donne le nombre de clients par secteur d’activité.
+--- SQL brute ---
+SELECT clients.secteur, COUNT(DISTINCT clients.id) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur;
+--- SQL corrigée ---
+SELECT clients.secteur, COUNT(DISTINCT clients.id) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur;
+--- SQL validée ---
+SELECT clients.secteur, COUNT(DISTINCT clients.id) FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.secteur
+Temps (s) : 2.96
+
+--- Question 08 ---
+Question : Quel est le montant moyen d’une commande pour chaque catégorie de produit ?
+--- SQL brute ---
+SELECT c.categorie, AVG(c.montant) as moyen_commande FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.categorie;
+--- SQL corrigée ---
+SELECT p.categorie, AVG(c.montant) as moyen_commande FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie;
+--- SQL validée ---
+SELECT p.categorie, AVG(c.montant) as moyen_commande FROM commandes c JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie
+Temps (s) : 0.98
+
+--- Question 09 ---
+Question : Liste des produits n’ayant jamais été commandés.
+--- SQL brute ---
+SELECT p.nom FROM produits p LEFT JOIN commandes c ON p.id = c.produit_id LEFT JOIN clients cl ON c.client_id = cl.id LEFT JOIN fournisseurs fo ON p.id = fo.id WHERE cl.id IS NULL AND fo.id IS NULL;
+--- SQL corrigée ---
+SELECT p.nom FROM produits p WHERE NOT EXISTS (SELECT 1 FROM commandes c WHERE c.produit_id = p.id);
+--- SQL validée ---
+SELECT p.nom FROM produits p WHERE NOT EXISTS (SELECT 1 FROM commandes c WHERE c.produit_id = p.id)
+Temps (s) : 1.16
+
+--- Question 10 ---
+Question : Quels sont les clients ayant commandé des produits de la catégorie "Informatique" ?
+--- SQL brute ---
+SELECT clients.nom FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id WHERE produits.categorie = 'Informatique';
+--- SQL corrigée ---
+SELECT 
+  c.nom 
+FROM 
+  clients c 
+  JOIN commandes cm ON c.id = cm.client_id 
+  JOIN produits p ON cm.produit_id = p.id 
+WHERE 
+  p.categorie = 'Informatique';
+--- SQL validée ---
+SELECT 
+  c.nom 
+FROM 
+  clients c 
+  JOIN commandes cm ON c.id = cm.client_id 
+  JOIN produits p ON cm.produit_id = p.id 
+WHERE 
+  p.categorie = 'Informatique
+Temps (s) : 3.01
+
+--- Question 11 ---
+Question : Donne la répartition des commandes par mois et par ville.
+--- SQL brute ---
+SELECT clients.ville, DATE_FORMAT(commandes.date_commande, '%Y-%m') AS mois, SUM(commandes.montant) FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY mois, clients.ville;
+--- SQL corrigée ---
+SELECT clients.ville, DATE_FORMAT(commandes.date_commande, '%Y-%m') AS mois, SUM(commandes.montant) 
+FROM commandes 
+JOIN clients ON commandes.client_id = clients.id 
+GROUP BY clients.ville, DATE_FORMAT(commandes.date_commande, '%Y-%m');
+--- SQL validée ---
+SELECT clients.ville, DATE_FORMAT(commandes.date_commande, '%Y-%m') AS mois, SUM(commandes.montant)
+Temps (s) : 2.93
+
+--- Question 12 ---
+Question : Quel est le produit le plus commandé par chaque client ?
+--- SQL brute ---
+SELECT clients.id, clients.nom, produits.id, produits.nom AS produit_commande, ROW_NUMBER() OVER (PARTITION BY clients.id ORDER BY SUM(commandes.montant) DESC) AS rang FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id, produits.id ORDER BY rang;
+--- SQL corrigée ---
+SELECT clients.id, clients.nom, produits.id, produits.nom AS produit_commande, SUM(commandes.montant) AS total_commande FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id, produits.id ORDER BY clients.id, SUM(commandes.montant) DESC;
+--- SQL validée ---
+SELECT clients.id, clients.nom, produits.id, produits.nom AS produit_commande, SUM(commandes.montant) AS total_commande FROM commandes JOIN clients ON commandes.client_id = clients.id JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.id, produits.id ORDER BY clients.id, SUM(commandes.montant) DESC
+Temps (s) : 3.02
+
+--- Question 13 ---
+Question : Liste les fournisseurs localisés en France.
+--- SQL brute ---
+SELECT DISTINCT clients.ville FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id WHERE clients.ville = 'France';
+--- SQL corrigée ---
+SELECT 
+    fournisseurs.pays
+FROM 
+    fournisseurs
+WHERE 
+    fournisseurs.pays = 'France';
+--- SQL validée ---
+SELECT 
+    fournisseurs.pays
+Temps (s) : 1.73
+
+--- Question 14 ---
+Question : Quel est le nombre de commandes par fournisseur de produits ?
+--- SQL brute ---
+SELECT fournisseurs.nom, COUNT(DISTINCT commandes.id) AS nombre_commandes FROM commandes INNER JOIN clients ON commandes.client_id = clients.id INNER JOIN produits ON commandes.produit_id = produits.id INNER JOIN fournisseurs ON produits.id = fournisseurs.id GROUP BY fournisseurs.nom;
+--- SQL corrigée ---
+SELECT fournisseurs.nom, COUNT(commandes.id) AS nombre_commandes 
+FROM commandes 
+INNER JOIN produits ON commandes.produit_id = produits.id 
+INNER JOIN fournisseurs ON produits.id = fournisseurs.id 
+GROUP BY fournisseurs.nom;
+--- SQL validée ---
+SELECT fournisseurs.nom, COUNT(commandes.id) AS nombre_commandes 
+FROM commandes 
+INNER JOIN produits ON commandes.produit_id = produits.id 
+INNER JOIN fournisseurs ON produits.id = fournisseurs.id 
+GROUP BY fournisseurs.nom
+Temps (s) : 1.38
+
+--- Question 15 ---
+Question : Quels sont les clients qui n'ont jamais passé de commande ?
+--- SQL brute ---
+SELECT clients.nom FROM clients LEFT JOIN commandes ON clients.id = commandes.client_id LEFT JOIN produits ON commandes.produit_id = produits.id WHERE commandes.id IS NULL;
+--- SQL corrigée ---
+SELECT clients.nom FROM clients WHERE clients.id NOT IN (SELECT commandes.client_id FROM commandes);
+--- SQL validée ---
+SELECT clients.nom FROM clients WHERE clients.id NOT IN (SELECT commandes.client_id FROM commandes)
+Temps (s) : 1.03
+
+--- Question 16 ---
+Question : Quel est le montant total des commandes pour l’année 2024 ?
+--- SQL brute ---
+SELECT SUM(c.montant) FROM commandes c INNER JOIN clients cl ON c.client_id = cl.id INNER JOIN produits p ON c.produit_id = p.id WHERE c.date_commande >= '2024-01-01' AND c.date_commande <= '2024-12-31';
+--- SQL corrigée ---
+SELECT SUM(c.montant) FROM commandes c WHERE c.date_commande >= '2024-01-01' AND c.date_commande <= '2024-12-31';
+--- SQL validée ---
+SELECT SUM(c.montant) FROM commandes c WHERE c.date_commande >= '2024-01-01' AND c.date_commande <= '2024-12-31
+Temps (s) : 0.62
+
+--- Question 17 ---
+Question : Liste les commandes dont le montant dépasse 1000 euros.
+--- SQL brute ---
+SELECT clients.nom, produits.nom, commandes.montant FROM commandes INNER JOIN clients ON commandes.client_id = clients.id INNER JOIN produits ON commandes.produit_id = produits.id WHERE commandes.montant > 1000;
+--- SQL corrigée ---
+SELECT clients.nom, produits.nom, commandes.montant FROM commandes INNER JOIN clients ON commandes.client_id = clients.id INNER JOIN produits ON commandes.produit_id = produits.id WHERE commandes.montant > 1000;
+--- SQL validée ---
+SELECT clients.nom, produits.nom, commandes.montant FROM commandes INNER JOIN clients ON commandes.client_id = clients.id INNER JOIN produits ON commandes.produit_id = produits.id WHERE commandes.montant > 1000
+Temps (s) : 3.02
+
+--- Question 18 ---
+Question : Donne la moyenne du montant des commandes par ville.
+--- SQL brute ---
+SELECT c.ville, AVG(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id JOIN produits p ON c.produit_id = p.id GROUP BY c.ville;
+--- SQL corrigée ---
+SELECT c.ville, AVG(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id GROUP BY c.ville;
+--- SQL validée ---
+SELECT c.ville, AVG(c.montant) FROM commandes c JOIN clients cl ON c.client_id = cl.id GROUP BY c.ville
+Temps (s) : 0.57
+
+--- Question 19 ---
+Question : Quel est le nombre de produits par catégorie ?
+--- SQL brute ---
+SELECT p.categorie, COUNT(c.id) FROM commandes c INNER JOIN produits p ON c.produit_id = p.id GROUP BY p.categorie;
+--- SQL corrigée ---
+SELECT p.categorie, COUNT(c.id) FROM produits p LEFT JOIN commandes c ON p.id = c.produit_id GROUP BY p.categorie;
+--- SQL validée ---
+SELECT p.categorie, COUNT(c.id) FROM produits p LEFT JOIN commandes c ON p.id = c.produit_id GROUP BY p.categorie
+Temps (s) : 0.88
+
+--- Question 20 ---
+Question : Quels sont les 5 clients ayant le plus commandé en valeur totale ?
+--- SQL brute ---
+SELECT clients.nom, SUM(commandes.montant) as total_commandé FROM clients INNER JOIN commandes ON clients.id = commandes.client_id INNER JOIN produits ON commandes.produit_id = produits.id GROUP BY clients.nom ORDER BY total_commandé DESC LIMIT 5;
+--- SQL corrigée ---
+SELECT clients.nom, SUM(commandes.montant) as total_commandé FROM clients INNER JOIN commandes ON clients.id = commandes.client_id GROUP BY clients.nom ORDER BY total_commandé DESC LIMIT 5;
+--- SQL validée ---
+SELECT clients.nom, SUM(commandes.montant) as total_commandé FROM clients INNER JOIN commandes ON clients.id = commandes.client_id GROUP BY clients.nom ORDER BY total_commandé DESC LIMIT 5
+Temps (s) : 3.01
+
